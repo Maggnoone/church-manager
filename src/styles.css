@@ -1,0 +1,484 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Esperanza de San Pablo — Sistema de gestión de Confirmación
+ * Lenguaje visual: teal primario, superficies suaves y tipografía
+ * Inter (texto), Geist (display) y Cormorant Garamond (serif).
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-card: 20px;
+  --radius-pill: 999px;
+
+  /* Colores raw de la paleta teal */
+  --color-palette-1: #0c1a17;   /* ink */
+  --color-palette-2: #2dd4bf;   /* teal light */
+  --color-palette-3: #ffffff;
+  --color-palette-4: #0d9488;   /* teal */
+  --color-palette-5: #0f766e;   /* teal strong */
+  --color-palette-6: #f2f8f6;   /* surface-2 */
+  --color-palette-7: #d97706;   /* amber */
+  --color-palette-8: #fbbf24;   /* amber light */
+
+  /* Tokens semánticos */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --shadow-soft: var(--shadow-soft-token);
+  --shadow-elegant: var(--shadow-elegant-token);
+  --shadow-glow: var(--shadow-glow-token);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+}
+
+:root {
+  --radius: 1rem;
+
+  /* Base */
+  --background: #f5f9f8;
+  --foreground: #0c1a17;
+  --card: #ffffff;
+  --card-foreground: #0c1a17;
+  --popover: #ffffff;
+  --popover-foreground: #0c1a17;
+
+  /* Teal primario */
+  --primary: #0d9488;
+  --primary-foreground: #ffffff;
+  --primary-glow: #14b8a6;
+
+  /* Superficies suaves */
+  --secondary: #f2f8f6;
+  --secondary-foreground: #0c1a17;
+
+  --muted: #f2f8f6;
+  --muted-foreground: #5c7570;
+
+  /* Acento teal + dorado */
+  --accent: #d3f4ec;
+  --accent-foreground: #0f766e;
+  --gold: #fbbf24;
+  --gold-foreground: #0c1a17;
+
+  /* Estados */
+  --destructive: #e11d48;
+  --destructive-foreground: #ffffff;
+  --success: #059669;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+
+  /* UI */
+  --border: rgba(13, 42, 37, 0.07);
+  --input: #e2ece9;
+  --ring: #0d9488;
+
+  /* Charts */
+  --chart-1: #0d9488;
+  --chart-2: #2dd4bf;
+  --chart-3: #059669;
+  --chart-4: #fbbf24;
+  --chart-5: #0c1a17;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0c1a17;
+  --sidebar-primary: #0d9488;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f8f6;
+  --sidebar-accent-foreground: #0c1a17;
+  --sidebar-border: rgba(13, 42, 37, 0.07);
+  --sidebar-ring: #0d9488;
+
+  /* Gradients & shadows */
+  --gradient-primary: linear-gradient(135deg, #0d9488, #0f766e);
+  --gradient-gold: linear-gradient(135deg, #fbbf24, #d97706);
+  --gradient-hero: linear-gradient(180deg, #f5f9f8, #ffffff);
+  --gradient-brand: linear-gradient(150deg, #0f766e 0%, #0c3b36 48%, #08120f 100%);
+  --shadow-soft-token: 0 1px 3px rgba(13, 42, 37, 0.05), 0 1px 2px rgba(13, 42, 37, 0.04);
+  --shadow-elegant-token: 0 8px 24px rgba(13, 42, 37, 0.08);
+  --shadow-glow-token: 0 0 40px rgba(13, 148, 136, 0.18);
+}
+
+.dark {
+  --background: #08120f;
+  --foreground: #e8faf5;
+  --card: #0f1e1a;
+  --card-foreground: #e8faf5;
+  --popover: #0f1e1a;
+  --popover-foreground: #e8faf5;
+
+  --primary: #2dd4bf;
+  --primary-foreground: #08120f;
+  --primary-glow: #5eead4;
+
+  --secondary: #142a24;
+  --secondary-foreground: #e8faf5;
+
+  --muted: #142a24;
+  --muted-foreground: #8ba39d;
+
+  --accent: rgba(45, 212, 191, 0.13);
+  --accent-foreground: #5eead4;
+  --gold: #fbbf24;
+  --gold-foreground: #08120f;
+
+  --destructive: #fb7185;
+  --destructive-foreground: #08120f;
+  --success: #34d399;
+  --success-foreground: #08120f;
+  --warning: #fbbf24;
+  --warning-foreground: #08120f;
+
+  --border: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #2dd4bf;
+
+  --chart-1: #2dd4bf;
+  --chart-2: #5eead4;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #e8faf5;
+
+  --sidebar: #0f1e1a;
+  --sidebar-foreground: #e8faf5;
+  --sidebar-primary: #2dd4bf;
+  --sidebar-primary-foreground: #08120f;
+  --sidebar-accent: #142a24;
+  --sidebar-accent-foreground: #e8faf5;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
+  --sidebar-ring: #2dd4bf;
+
+  --gradient-primary: linear-gradient(135deg, #2dd4bf, #14b8a6);
+  --gradient-gold: linear-gradient(135deg, #fbbf24, #d97706);
+  --gradient-hero: linear-gradient(180deg, #08120f, #0f1e1a);
+  --shadow-soft-token: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-elegant-token: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow-token: 0 0 40px rgba(45, 212, 191, 0.15);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  /* Skip link for keyboard navigation */
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 9999;
+    border-radius: var(--radius-md);
+    background-color: var(--primary);
+    padding: 0.5rem 1rem;
+    color: var(--primary-foreground);
+    font-weight: 500;
+    text-decoration: none;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus {
+    top: 1rem;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Minimum touch targets on coarse pointer devices (mobile) */
+  @media (pointer: coarse) {
+    button,
+    [role="button"],
+    a[href] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+@layer utilities {
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+  .bg-gradient-gold {
+    background-image: var(--gradient-gold);
+  }
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  /* Active press feedback */
+  .active\:scale-95:active {
+    transform: scale(0.95);
+  }
+  /* Page transition */
+  .page-transition {
+    animation: pageFadeIn 0.3s ease-out;
+  }
+  @keyframes pageFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .page-transition {
+      animation: none;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ==========================================================================
+ * Sidebar rail — floating card rail, restyled from the outside.
+ *
+ * Marker classes (kept literal in src/components/AppSidebar.tsx):
+ *   .sidebar-rail       → the fixed Sidebar container
+ *   .sidebar-rail-item  → interactive rows (nav, brand, user chip, logout)
+ *   .sidebar-label      → text revealed with fade + slide while hovering
+ *
+ * src/components/ui/sidebar.tsx is not modified. The unlayered rules below win
+ * over Tailwind's layered utilities; the `!important` row sizing lives inside
+ * `@layer utilities` so it can also beat the primitive's `!size-8` / `!p-2`
+ * important utilities.
+ * ========================================================================== */
+
+:root {
+  /* Rail motion. Tune these two values to make the expand feel softer or snappier. */
+  --sidebar-rail-duration: 480ms;
+  --sidebar-rail-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sidebar-rail {
+  /* Floating-card geometry. `cn`/tailwind-merge drops the primitive's `h-svh`
+     (same group as the JSX `h-auto`) and Tailwind's utility order lets
+     `top-3`/`bottom-3` win over `inset-y-0`, so the JSX classes already win.
+     These pinned values are a defensive guarantee of the 12px floating gutter. */
+  top: 0.75rem;
+  bottom: 0.75rem;
+  height: auto;
+  /* Sit above the sticky topbar (z-40) so the expanded rail stays visible;
+     still below modals/sheets (z-50). */
+  z-index: 45;
+  border-right-width: 0;
+  transition-duration: var(--sidebar-rail-duration);
+  transition-timing-function: var(--sidebar-rail-ease);
+}
+
+/* The spacer must animate in lockstep with the rail when pinning or unpinning
+   the sidebar; otherwise the content column settles before the card finishes
+   and the two edges visibly desync. */
+[data-collapsible] > div:first-child {
+  transition-duration: var(--sidebar-rail-duration);
+  transition-timing-function: var(--sidebar-rail-ease);
+}
+
+.sidebar-rail > [data-sidebar="sidebar"] {
+  border-radius: 1.5rem;
+  border: 1px solid var(--sidebar-border);
+  box-shadow: var(--shadow-soft-token);
+  overflow: hidden;
+}
+
+/* Sidebar navigation scrollbar — subtle teal treatment that follows the theme. */
+.sidebar-rail [data-sidebar="content"] {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--sidebar-primary) 45%, transparent) transparent;
+}
+
+.sidebar-rail [data-sidebar="content"]::-webkit-scrollbar {
+  width: 0.4rem;
+}
+
+.sidebar-rail [data-sidebar="content"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-rail [data-sidebar="content"]::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--sidebar-primary) 45%, transparent);
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  background-clip: padding-box;
+}
+
+.sidebar-rail [data-sidebar="content"]::-webkit-scrollbar-thumb:hover {
+  background-color: var(--sidebar-primary);
+}
+
+.sidebar-label {
+  transition: opacity 260ms ease-out, transform 260ms ease-out;
+}
+
+/* REST state — applies on every ≥768px viewport, including touch-only devices
+   that never match `(hover: hover)`. Without this split the rail would fall
+   back to the primitive's 3rem width and clip the rows. */
+@media (min-width: 768px) {
+  /* 96px rail at rest. */
+  [data-collapsible="icon"] {
+    --sidebar-width-icon: 6rem;
+  }
+
+  /* Center rail content horizontally. */
+  [data-collapsible="icon"] .sidebar-rail [data-sidebar="header"],
+  [data-collapsible="icon"] .sidebar-rail [data-sidebar="menu"],
+  [data-collapsible="icon"] .sidebar-rail [data-sidebar="footer"] {
+    align-items: center;
+  }
+
+  /* Labels hidden at rest. */
+  [data-collapsible="icon"] .sidebar-rail .sidebar-label {
+    opacity: 0;
+    transform: translateX(-0.25rem);
+  }
+
+  /* Group labels stay collapsed at rest; icon mode force-hides them with
+     `-mt-8` / `opacity-0`. */
+  [data-collapsible="icon"] .sidebar-rail [data-sidebar="group-label"] {
+    margin-top: -2rem;
+    opacity: 0;
+  }
+
+  /* Keep a long nav scrollable while collapsed (icon mode sets
+     `overflow-hidden` on the content). */
+  [data-collapsible="icon"] .sidebar-rail [data-sidebar="content"] {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* Keyboard users: focusing anything inside the rail reveals labels. This is
+     intentionally NOT gated by `(hover: hover)` so touch-only + keyboard
+     devices can still read the rail. Mirrors the hover reveal below. */
+  [data-collapsible="icon"]:focus-within .sidebar-rail {
+    width: 16.5rem;
+  }
+  [data-collapsible="icon"]:focus-within .sidebar-rail .sidebar-label {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 160ms;
+  }
+  [data-collapsible="icon"]:focus-within .sidebar-rail [data-sidebar="group-label"] {
+    margin-top: 0;
+    opacity: 1;
+    transition-delay: 160ms;
+  }
+}
+
+/* HOVER state — pointer devices only. Kept separate from the rest rules so
+   touch-only ≥768px devices keep the full rail and use `:focus-within`.
+   Hover expands only the fixed container (overlay); the spacer keeps its 96px,
+   so the content column — and Recharts' ResponsiveContainer — never reflows. */
+@media (min-width: 768px) and (hover: hover) {
+  [data-collapsible="icon"]:hover .sidebar-rail {
+    width: 16.5rem;
+  }
+  [data-collapsible="icon"]:hover .sidebar-rail .sidebar-label {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 160ms;
+  }
+  [data-collapsible="icon"]:hover .sidebar-rail [data-sidebar="group-label"] {
+    margin-top: 0;
+    opacity: 1;
+    transition-delay: 160ms;
+  }
+}
+
+/* Row sizing must beat the primitive's `!size-8` / `!p-2` important utilities.
+   Same `utilities` layer + higher specificity keeps this deterministic. */
+@layer utilities {
+  /* Rest sizing — every ≥768px viewport, including touch-only devices. */
+  @media (min-width: 768px) {
+    [data-collapsible="icon"] .sidebar-rail .sidebar-rail-item {
+      width: 2.75rem !important;
+      height: 2.75rem !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      overflow: hidden;
+      /* Match the rail so rows glide with the card instead of snapping. */
+      transition-duration: var(--sidebar-rail-duration);
+      transition-timing-function: var(--sidebar-rail-ease);
+    }
+    /* Keyboard expansion. */
+    [data-collapsible="icon"]:focus-within .sidebar-rail .sidebar-rail-item {
+      width: 13rem !important;
+    }
+  }
+  /* Pointer-only expansion. */
+  @media (min-width: 768px) and (hover: hover) {
+    [data-collapsible="icon"]:hover .sidebar-rail .sidebar-rail-item {
+      width: 13rem !important;
+    }
+  }
+}
