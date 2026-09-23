@@ -155,7 +155,7 @@ describe("buildAttendanceTrendFromResumen", () => {
     );
   });
 
-  it("excludes future and zero-attendance charlas", () => {
+  it("includes future and zero-confirmando charlas, using 0% for a zero denominator", () => {
     const resumen = [
       resumenItem({
         charla_id: "past",
@@ -179,7 +179,25 @@ describe("buildAttendanceTrendFromResumen", () => {
 
     const result = buildAttendanceTrendFromResumen(resumen, new Date("2026-01-15T12:00:00.000Z"));
 
-    expect(result.map((point) => point.key)).toEqual(["past"]);
+    expect(result.map((point) => point.key)).toEqual(["past", "empty", "future"]);
+    expect(result.find((point) => point.key === "empty")).toMatchObject({
+      total: 0,
+      present: 0,
+      absent: 0,
+      attendancePercentage: 0,
+    });
+  });
+
+  it("excludes only invalid dates", () => {
+    const result = buildAttendanceTrendFromResumen(
+      [
+        resumenItem({ charla_id: "valid", fecha: "2026-01-02T12:00:00.000Z" }),
+        resumenItem({ charla_id: "invalid", fecha: "not-a-date" }),
+      ],
+      new Date("2026-01-01T12:00:00.000Z"),
+    );
+
+    expect(result.map((point) => point.key)).toEqual(["valid"]);
   });
 
   it("computes attendance percentage and maps every field", () => {

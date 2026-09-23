@@ -88,12 +88,9 @@ const compactCurrency = new Intl.NumberFormat("es-AR", {
 /*  Asistencia                                                        */
 /* ================================================================== */
 
-const CHART_PAGE_SIZE = 5;
-
 function AsistenciaSection() {
   const [subTab, setSubTab] = useState<"charla" | "confirmando">("charla");
   const [page, setPage] = useState(1);
-  const [chartPage, setChartPage] = useState(1);
   const [selectedConfirmando, setSelectedConfirmando] = useState<AsistenciaPorConfirmando | null>(
     null,
   );
@@ -121,13 +118,6 @@ function AsistenciaSection() {
   const attendanceTrend = useMemo(
     () => buildAttendanceTrendFromResumen(filteredCharlas),
     [filteredCharlas],
-  );
-
-  const chartTotalPages = Math.max(1, Math.ceil(attendanceTrend.length / CHART_PAGE_SIZE));
-  const chartPageClamped = Math.min(chartPage, chartTotalPages);
-  const attendanceTrendPaginated = attendanceTrend.slice(
-    (chartPageClamped - 1) * CHART_PAGE_SIZE,
-    chartPageClamped * CHART_PAGE_SIZE,
   );
 
   const charlaTotalPages = Math.max(1, Math.ceil(filteredCharlas.length / LIST_PAGE_SIZE));
@@ -200,7 +190,6 @@ function AsistenciaSection() {
             onChange={(e) => {
               setGroupFilter(e.target.value);
               setPage(1);
-              setChartPage(1);
             }}
           >
             <option value="">Todos los grupos</option>
@@ -232,15 +221,7 @@ function AsistenciaSection() {
         </div>
       </div>
 
-      <AttendanceTrendChart data={attendanceTrendPaginated} isLoading={loadingCharlas} />
-      <ListPagination
-        page={chartPageClamped}
-        totalPages={chartTotalPages}
-        total={attendanceTrend.length}
-        itemLabel="charlas del gráfico"
-        onPageChange={setChartPage}
-        pageSize={CHART_PAGE_SIZE}
-      />
+      <AttendanceTrendChart data={attendanceTrend} isLoading={loadingCharlas} />
 
       {/* ── Por charla ── */}
       {subTab === "charla" && (

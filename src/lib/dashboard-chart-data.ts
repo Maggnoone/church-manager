@@ -225,15 +225,13 @@ export function buildConfirmandoAttendanceTrend(
 
 export function buildAttendanceTrendFromResumen(
   resumen: readonly AttendanceResumenPoint[],
-  now: Date = new Date(),
+  _now: Date = new Date(),
 ): AttendanceTrendPoint[] {
   return resumen
     .flatMap((item) => {
       const meetingDate = new Date(item.fecha);
 
       if (Number.isNaN(meetingDate.getTime())) return [];
-      if (meetingDate.getTime() > now.getTime()) return [];
-      if (item.total_confirmandos <= 0) return [];
 
       return [
         {

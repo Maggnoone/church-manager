@@ -123,8 +123,7 @@ describe("useAsistenciaPorConfirmando", () => {
       { id: "c7", group_id: "g1" },
       { id: "c8", group_id: null },
       { id: "c9", group_id: "g1" },
-      { id: "c10", group_id: null },
-      { id: "cx", group_id: "g2" },
+      { id: "c10", group_id: "g2" },
     ];
     mockResponses.asistencia = [
       { id: "a1", charla_id: "c1", confirmando_id: "conf-1", presente: true },
@@ -134,7 +133,7 @@ describe("useAsistenciaPorConfirmando", () => {
     ];
   });
 
-  it("counts all applicable charlas including those without attendance", async () => {
+  it("counts all registered charlas across groups including those without attendance", async () => {
     const { result } = renderHook(() => useAsistenciaPorConfirmando(), { wrapper });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

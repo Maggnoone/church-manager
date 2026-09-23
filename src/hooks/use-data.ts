@@ -463,16 +463,14 @@ export function useAsistenciaPorConfirmando() {
       if (aErr) throw aErr;
 
       return (confirmandos ?? []).map((c) => {
-        const relevantCharlas = (charlas ?? []).filter(
-          (ch) => ch.group_id === c.group_id || ch.group_id === null,
-        );
-        const relevantCharlaIds = new Set(relevantCharlas.map((ch) => ch.id));
+        const registeredCharlas = charlas ?? [];
+        const registeredCharlaIds = new Set(registeredCharlas.map((ch) => ch.id));
 
         const relevantAsistencia = (asistencia ?? []).filter(
-          (a) => a.confirmando_id === c.id && relevantCharlaIds.has(a.charla_id),
+          (a) => a.confirmando_id === c.id && registeredCharlaIds.has(a.charla_id),
         );
         const asistidas = relevantAsistencia.filter((a) => a.presente).length;
-        const total = relevantCharlas.length;
+        const total = registeredCharlas.length;
         const fullName = c.full_name;
         const grupo =
           (c as unknown as { grupos: { nombre: string | null } | null }).grupos?.nombre ?? null;
