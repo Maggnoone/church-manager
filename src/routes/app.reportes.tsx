@@ -25,7 +25,10 @@ import {
   type AsistenciaPorConfirmando,
 } from "@/hooks/use-data";
 import { buildBalance, buildTotals } from "@/lib/balances";
-import { buildAttendanceTrendFromResumen } from "@/lib/dashboard-chart-data";
+import {
+  buildAttendanceTrendFromResumen,
+  sortCharlasChronologically,
+} from "@/lib/dashboard-chart-data";
 import { buildPaymentMethodBreakdown, buildPaymentStatusBreakdown } from "@/lib/payment-chart-data";
 import { AttendanceTrendChart } from "@/components/dashboard/attendance-trend-chart";
 import { CategoryDonutChart } from "@/components/dashboard/category-donut-chart";
@@ -115,16 +118,21 @@ function AsistenciaSection() {
     return confirmandos.filter((c) => c.grupo === groupFilter);
   }, [confirmandos, groupFilter]);
 
-  const attendanceTrend = useMemo(
-    () => buildAttendanceTrendFromResumen(filteredCharlas),
+  const sortedFilteredCharlas = useMemo(
+    () => sortCharlasChronologically(filteredCharlas),
     [filteredCharlas],
   );
 
-  const charlaTotalPages = Math.max(1, Math.ceil(filteredCharlas.length / LIST_PAGE_SIZE));
+  const charlaTotalPages = Math.max(1, Math.ceil(sortedFilteredCharlas.length / LIST_PAGE_SIZE));
   const charlaPage = Math.min(page, charlaTotalPages);
-  const charlasPaginated = filteredCharlas.slice(
+  const charlasPaginated = sortedFilteredCharlas.slice(
     (charlaPage - 1) * LIST_PAGE_SIZE,
     charlaPage * LIST_PAGE_SIZE,
+  );
+
+  const attendanceTrend = useMemo(
+    () => buildAttendanceTrendFromResumen(charlasPaginated),
+    [charlasPaginated],
   );
 
   const confTotalPages = Math.max(1, Math.ceil(filteredConfirmandos.length / LIST_PAGE_SIZE));
@@ -135,7 +143,7 @@ function AsistenciaSection() {
   );
 
   const exportRowsCharla = () =>
-    filteredCharlas.map((c) => ({
+    sortedFilteredCharlas.map((c) => ({
       Charla: c.titulo,
       Fecha: c.fecha,
       Tipo: c.tipo,

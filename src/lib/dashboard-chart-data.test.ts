@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildAttendanceTrend,
   buildAttendanceTrendFromResumen,
+  sortCharlasChronologically,
   buildConfirmandoAttendanceTrend,
   buildConfirmandoStatusCounts,
   buildPendingRequirements,
@@ -111,6 +112,24 @@ describe("buildAttendanceTrend", () => {
   });
 });
 
+describe("sortCharlasChronologically", () => {
+  it("sorts unsorted charlas by date then charla_id without mutating the input", () => {
+    const charlas = [
+      { charla_id: "c", fecha: "2026-02-01T12:00:00.000Z" },
+      { charla_id: "b", fecha: "2026-01-01T12:00:00.000Z" },
+      { charla_id: "z", fecha: "2026-01-01T12:00:00.000Z" },
+      { charla_id: "a", fecha: "2026-01-01T12:00:00.000Z" },
+    ];
+    const original = [...charlas];
+
+    expect(sortCharlasChronologically(charlas).map(({ charla_id }) => charla_id)).toEqual([
+      "a", "b", "z", "c",
+    ]);
+    expect(charlas).toEqual(original);
+    expect(sortCharlasChronologically(charlas)).not.toBe(charlas);
+  });
+});
+
 describe("buildAttendanceTrendFromResumen", () => {
   const resumenItem = (
     overrides: Partial<AttendanceResumenPoint> = {},
@@ -122,6 +141,19 @@ describe("buildAttendanceTrendFromResumen", () => {
     presentes: 2,
     ausentes: 1,
     ...overrides,
+  });
+
+  it("sorts unsorted multi-year data chronologically", () => {
+    const result = buildAttendanceTrendFromResumen(
+      [
+        resumenItem({ charla_id: "jan-2026", fecha: "2026-01-02T12:00:00.000Z" }),
+        resumenItem({ charla_id: "dec-2024", fecha: "2024-12-31T12:00:00.000Z" }),
+        resumenItem({ charla_id: "jan-2025", fecha: "2025-01-01T12:00:00.000Z" }),
+        resumenItem({ charla_id: "dec-2025", fecha: "2025-12-31T12:00:00.000Z" }),
+      ],
+    );
+
+    expect(result.map((point) => point.key)).toEqual(["dec-2024", "jan-2025", "dec-2025", "jan-2026"]);
   });
 
   it("keeps all eligible past charlas, sorted chronological ascending", () => {

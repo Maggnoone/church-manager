@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ResponsiveDialog } from "@/components/ResponsiveDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CharlaDateTimeField } from "@/components/charla-date-time-field";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Inbox } from "lucide-react";
 import { DeleteDialog } from "@/components/DeleteDialog";
@@ -22,6 +23,7 @@ import { FieldError } from "@/components/FieldError";
 import { ListPagination, LIST_PAGE_SIZE } from "@/components/ListPagination";
 import { toast } from "sonner";
 import { formatDateTime } from "@/lib/export";
+import { localDateTimeFields, localDateTimeToISOString, timestampToLocalDateTimeFields } from "@/lib/session-date-time";
 import { useAuth } from "@/hooks/use-auth";
 import { useCharlas } from "@/hooks/use-data";
 import type { Charla, CharlaInsert, SessionType } from "@/integrations/supabase/types";
@@ -32,6 +34,9 @@ const schema = z.object({
   titulo: z.string().min(2).max(120),
   descripcion: z.string().max(2000).optional().or(z.literal("")),
   fecha: z.string().min(1, "Requerido"),
+  hora: z.string().min(1, "Requerido"),
+  minuto: z.string().min(1, "Requerido"),
+  periodo: z.enum(["AM", "PM"]),
   duracion_min: z.coerce.number().int().min(15).max(600),
   ponente: z.string().max(120).optional().or(z.literal("")),
   ubicacion: z.string().max(120).optional().or(z.literal("")),
@@ -54,16 +59,25 @@ function CharlasPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { titulo: "", duracion_min: 60, tipo: "charla", fecha: "" },
+    defaultValues: { titulo: "", duracion_min: 60, tipo: "charla", fecha: "", hora: "", minuto: "00", periodo: "AM" },
   });
 
-  const openNew = () => { setEditing(null); form.reset({ titulo: "", descripcion: "", duracion_min: 60, tipo: "charla", ponente: "", ubicacion: "", fecha: new Date().toISOString().slice(0, 16) }); setOpen(true); };
+  const openNew = () => {
+    const time = localDateTimeFields(new Date());
+    setEditing(null);
+    form.reset({ titulo: "", descripcion: "", duracion_min: 60, tipo: "charla", ponente: "", ubicacion: "", fecha: time.date, hora: time.hour, minuto: time.minute, periodo: time.period });
+    setOpen(true);
+  };
   const openEdit = (r: Charla) => {
+    const time = timestampToLocalDateTimeFields(r.fecha);
     setEditing(r);
     form.reset({
       titulo: r.titulo,
       descripcion: r.descripcion ?? "",
-      fecha: new Date(r.fecha).toISOString().slice(0, 16),
+      fecha: time.date,
+      hora: time.hour,
+      minuto: time.minute,
+      periodo: time.period,
       duracion_min: r.duracion_min ?? 60,
       ponente: r.ponente ?? "",
       ubicacion: r.ubicacion ?? "",
@@ -74,7 +88,7 @@ function CharlasPage() {
 
   const buildPayload = (v: FormValues): CharlaInsert => ({
     titulo: v.titulo,
-    fecha: new Date(v.fecha).toISOString(),
+    fecha: localDateTimeToISOString({ date: v.fecha, hour: v.hora, minute: v.minuto, period: v.periodo }),
     duracion_min: v.duracion_min,
     tipo: v.tipo as SessionType,
     descripcion: v.descripcion || null,
@@ -224,9 +238,18 @@ function CharlasPage() {
             <Input id="titulo" {...form.register("titulo")} aria-invalid={!!form.formState.errors.titulo} />
             <FieldError name="titulo" form={form} />
           </div>
-          <div className="space-y-1">
-            <Label htmlFor="fecha">Fecha y hora <span className="text-destructive">*</span></Label>
-            <Input id="fecha" type="datetime-local" {...form.register("fecha")} aria-invalid={!!form.formState.errors.fecha} />
+          <div className="sm:col-span-2 space-y-1">
+            <Label>Fecha y hora <span className="text-destructive">*</span></Label>
+            <CharlaDateTimeField
+              date={form.watch("fecha")}
+              hour={form.watch("hora")}
+              minute={form.watch("minuto")}
+              period={form.watch("periodo")}
+              onDateChange={(date) => form.setValue("fecha", date, { shouldValidate: true })}
+              onHourChange={(hour) => form.setValue("hora", hour, { shouldValidate: true })}
+              onMinuteChange={(minute) => form.setValue("minuto", minute, { shouldValidate: true })}
+              onPeriodChange={(period) => form.setValue("periodo", period, { shouldValidate: true })}
+            />
             <FieldError name="fecha" form={form} />
           </div>
           <div className="space-y-1">

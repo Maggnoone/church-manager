@@ -14,6 +14,7 @@ import { useCharlasList, useConfirmandosActivos, useAsistencia, useGruposSimple 
 import { ListPagination, LIST_PAGE_SIZE } from "@/components/ListPagination";
 import { useAuth } from "@/hooks/use-auth";
 import type { Asistencia } from "@/integrations/supabase/types";
+import { getAttendanceExportDate } from "@/lib/attendance-export-data";
 
 export const Route = createFileRoute("/app/asistencia")({ component: AsistenciaPage });
 
@@ -63,7 +64,10 @@ function AsistenciaPage() {
       if (ctx?.previous) qc.setQueryData(["asistencia", charlaId], ctx.previous);
       toast.error(e.message);
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ["asistencia", charlaId] }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["asistencia", charlaId] });
+      qc.invalidateQueries({ queryKey: ["asistencia-resumen"] });
+    },
   });
 
   const filteredConfirmandos = useMemo(() => {
@@ -97,10 +101,10 @@ function AsistenciaPage() {
         Confirmando: c.full_name,
         Grupo: c.grupos?.nombre ?? "Sin grupo",
         Estado: a?.presente ? "Presente" : "Ausente",
-        "Fecha Registro": a?.created_at ? formatDateTime(a.created_at) : "—",
+        "Fecha y hora de charla": getAttendanceExportDate(charlaSeleccionada, a),
       };
     });
-  }, [charlaId, filteredConfirmandos, asistMap]);
+  }, [charlaId, charlaSeleccionada, filteredConfirmandos, asistMap]);
 
   const handleExportCSV = () => {
     if (!exportData.length) { toast.error("No hay datos para exportar"); return; }
@@ -119,8 +123,8 @@ function AsistenciaPage() {
   const handleExportPDF = () => {
     if (!exportData.length) { toast.error("No hay datos para exportar"); return; }
     const filename = `asistencia-${charlaSeleccionada?.titulo || "charla"}-${new Date().toISOString().split("T")[0]}`;
-    const columns = ["Confirmando", "Grupo", "Estado", "Fecha Registro"];
-    const rows = exportData.map((item) => [item["Confirmando"], item["Grupo"], item["Estado"], item["Fecha Registro"]]);
+    const columns = ["Confirmando", "Grupo", "Estado", "Fecha y hora de charla"];
+    const rows = exportData.map((item) => [item["Confirmando"], item["Grupo"], item["Estado"], item["Fecha y hora de charla"]]);
     const subtitle = `Charla: ${charlaSeleccionada?.titulo || "—"} | ${formatDateTime(charlaSeleccionada?.fecha)} | ${presentes}/${filteredConfirmandos.length} presentes`;
     exportToPDF("Reporte de Asistencia", columns, rows, filename, subtitle, (data) => {
       const text = data.cell.text.join(" ");

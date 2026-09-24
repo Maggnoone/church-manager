@@ -40,7 +40,12 @@ function AttendanceTooltip({ active, payload }: TooltipProps<number, string>) {
   return (
     <ChartTooltipFrame>
       <p className="font-medium">{point.title}</p>
-      <p className="mt-0.5 text-muted-foreground">{point.label}</p>
+      <p className="mt-0.5 text-muted-foreground">
+        {point.label} {new Date(point.date).getUTCFullYear()}
+      </p>
+      <p className="mt-0.5 text-muted-foreground">
+        Horario: {new Intl.DateTimeFormat("es-AR", { hour: "numeric", minute: "2-digit" }).format(new Date(point.date))}
+      </p>
       <p className="mt-2 font-semibold text-primary">{point.attendancePercentage}% de asistencia</p>
       <p className="mt-1 text-muted-foreground">
         {point.present} presentes · {point.absent} ausentes · {point.total} en total
@@ -74,12 +79,14 @@ export function AttendanceTrendChart({ data, isLoading, className }: AttendanceT
               </defs>
               <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" />
               <XAxis
-                dataKey="label"
+                dataKey="key"
+                tickFormatter={(key: string) => data.find((point) => point.key === key)?.label ?? ""}
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                 interval={0}
                 minTickGap={18}
+                tickMargin={0}
               />
               <YAxis
                 domain={[0, 100]}

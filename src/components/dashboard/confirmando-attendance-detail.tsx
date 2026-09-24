@@ -22,7 +22,7 @@ import { useAsistenciaHistorial } from "@/hooks/use-data";
 import { buildConfirmandoAttendanceTrend } from "@/lib/dashboard-chart-data";
 import { AttendanceTrendChart } from "./attendance-trend-chart";
 import { ListPagination } from "@/components/ListPagination";
-import { formatDate, exportToPDF } from "@/lib/export";
+import { formatDateTime, exportToPDF } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Calendar, CheckCircle2, XCircle, BarChart3, FileDown } from "lucide-react";
 
@@ -82,10 +82,10 @@ export function ConfirmandoAttendanceDetail({
 
   const handleExportPDF = () => {
     if (total === 0) return;
-    const columns = ["Charla", "Fecha", "Tipo", "Estado"];
+    const columns = ["Charla", "Fecha y hora de charla", "Tipo", "Estado"];
     const rows = historial.map((h) => [
       h.charlas?.titulo ?? "—",
-      h.charlas?.fecha ? formatDate(h.charlas.fecha) : "—",
+      h.charlas?.fecha ? formatDateTime(h.charlas.fecha) : "—",
       h.charlas?.tipo ?? "—",
       h.presente ? "Presente" : "Ausente",
     ]);
@@ -222,7 +222,7 @@ export function ConfirmandoAttendanceDetail({
                           <TableHeader>
                             <TableRow>
                               <TableHead>Charla</TableHead>
-                              <TableHead>Fecha</TableHead>
+                              <TableHead>Fecha y hora de charla</TableHead>
                               <TableHead>Tipo</TableHead>
                               <TableHead>Estado</TableHead>
                             </TableRow>
@@ -234,7 +234,7 @@ export function ConfirmandoAttendanceDetail({
                                   {h.charlas?.titulo ?? "—"}
                                 </TableCell>
                                 <TableCell>
-                                  {h.charlas?.fecha ? formatDate(h.charlas.fecha) : "—"}
+                                  {h.charlas?.fecha ? formatDateTime(h.charlas.fecha) : "—"}
                                 </TableCell>
                                 <TableCell className="capitalize">
                                   {h.charlas?.tipo ?? "—"}
@@ -275,8 +275,8 @@ export function ConfirmandoAttendanceDetail({
                                 )}
                               </div>
                               <div className="flex items-start justify-between gap-2 text-sm">
-                                <span className="text-muted-foreground">Fecha</span>
-                                <span>{h.charlas?.fecha ? formatDate(h.charlas.fecha) : "—"}</span>
+                                <span className="text-muted-foreground">Fecha y hora de charla</span>
+                                <span>{h.charlas?.fecha ? formatDateTime(h.charlas.fecha) : "—"}</span>
                               </div>
                               <div className="flex items-start justify-between gap-2 text-sm">
                                 <span className="text-muted-foreground">Tipo</span>

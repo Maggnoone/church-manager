@@ -174,6 +174,16 @@ export function buildAttendanceTrend(
     .map(({ point }) => point);
 }
 
+export function sortCharlasChronologically<T extends { fecha: string; charla_id: string }>(
+  charlas: readonly T[],
+): T[] {
+  return [...charlas].sort(
+    (left, right) =>
+      new Date(left.fecha).getTime() - new Date(right.fecha).getTime() ||
+      left.charla_id.localeCompare(right.charla_id),
+  );
+}
+
 export interface AttendanceResumenPoint {
   charla_id: string;
   titulo: string;
@@ -227,35 +237,22 @@ export function buildAttendanceTrendFromResumen(
   resumen: readonly AttendanceResumenPoint[],
   _now: Date = new Date(),
 ): AttendanceTrendPoint[] {
-  return resumen
-    .flatMap((item) => {
-      const meetingDate = new Date(item.fecha);
-
-      if (Number.isNaN(meetingDate.getTime())) return [];
-
-      return [
-        {
-          meetingDate,
-          point: {
-            key: item.charla_id,
-            date: item.fecha,
-            label: formatMeetingLabel(meetingDate),
-            title: item.titulo,
-            present: item.presentes,
-            absent: item.ausentes,
-            total: item.total_confirmandos,
-            attendancePercentage:
-              item.total_confirmandos > 0
-                ? Math.round((item.presentes / item.total_confirmandos) * 100)
-                : 0,
-          },
-        },
-      ];
-    })
-    .sort(
-      (left, right) =>
-        left.meetingDate.getTime() - right.meetingDate.getTime() ||
-        left.point.key.localeCompare(right.point.key),
-    )
-    .map(({ point }) => point);
+  return sortCharlasChronologically(
+    resumen.filter((item) => !Number.isNaN(new Date(item.fecha).getTime())),
+  ).map((item) => {
+    const meetingDate = new Date(item.fecha);
+    return {
+      key: item.charla_id,
+      date: item.fecha,
+      label: formatMeetingLabel(meetingDate),
+      title: item.titulo,
+      present: item.presentes,
+      absent: item.ausentes,
+      total: item.total_confirmandos,
+      attendancePercentage:
+        item.total_confirmandos > 0
+          ? Math.round((item.presentes / item.total_confirmandos) * 100)
+          : 0,
+    };
+  });
 }
