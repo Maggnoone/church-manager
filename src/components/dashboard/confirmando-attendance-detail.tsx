@@ -89,7 +89,7 @@ export function ConfirmandoAttendanceDetail({
       h.charlas?.tipo ?? "—",
       h.presente ? "Presente" : "Ausente",
     ]);
-    const subtitle = `Grupo: ${grupo ?? "Sin grupo"} | ${total} encuentros | ${presentes} presentes | ${ausentes} ausentes | ${pct}% asistencia`;
+    const subtitle = `Grupo: ${grupo ?? "Sin grupo"} | ${total} charlas | ${presentes} presentes | ${ausentes} ausentes | ${pct}% asistencia`;
     const filename = `asistencia-${fullName ?? "confirmando"}-${new Date().toISOString().split("T")[0]}`;
     exportToPDF(
       `Historial de Asistencia - ${fullName ?? "Confirmando"}`,
@@ -149,7 +149,7 @@ export function ConfirmandoAttendanceDetail({
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
-                        Encuentros
+                        Total charlas
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -212,7 +212,7 @@ export function ConfirmandoAttendanceDetail({
                     <div className="flex flex-col items-center justify-center rounded-lg border p-8 text-center">
                       <p className="font-medium text-foreground">Sin registros de asistencia</p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        No hay charlas pasadas con asistencia cargada para este confirmando.
+                        No hay charlas registradas para este confirmando.
                       </p>
                     </div>
                   ) : (

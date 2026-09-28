@@ -343,21 +343,30 @@ describe("buildConfirmandoAttendanceTrend", () => {
     });
   });
 
-  it("excludes future charlas", () => {
+  it("includes future charlas while keeping valid dates chronological", () => {
     const result = buildConfirmandoAttendanceTrend(
       [
+        { charla_id: "future", titulo: "Future", fecha: "2026-02-01T12:00:00.000Z", presente: false },
         { charla_id: "past", titulo: "Past", fecha: "2026-01-02T12:00:00.000Z", presente: true },
-        {
-          charla_id: "future",
-          titulo: "Future",
-          fecha: "2026-02-01T12:00:00.000Z",
-          presente: false,
-        },
       ],
       new Date("2026-01-15T12:00:00.000Z"),
     );
 
-    expect(result.map((point) => point.key)).toEqual(["past"]);
+    expect(result.map((point) => point.key)).toEqual(["past", "future"]);
+  });
+
+  it("includes invalid-date charlas and sorts them deterministically after valid dates", () => {
+    const result = buildConfirmandoAttendanceTrend([
+      { charla_id: "invalid-z", titulo: "Invalid Z", fecha: "not-a-date", presente: true },
+      { charla_id: "valid", titulo: "Valid", fecha: "2026-01-02T12:00:00.000Z", presente: true },
+      { charla_id: "invalid-a", titulo: "Invalid A", fecha: "also-invalid", presente: false },
+    ]);
+
+    expect(result.map((point) => point.key)).toEqual(["valid", "invalid-a", "invalid-z"]);
+    expect(result.filter((point) => point.key.startsWith("invalid")).map((point) => point.date)).toEqual([
+      "also-invalid",
+      "not-a-date",
+    ]);
   });
 
   it("returns an empty array for empty input", () => {

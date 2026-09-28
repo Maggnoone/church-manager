@@ -205,12 +205,9 @@ export function buildConfirmandoAttendanceTrend(
   now: Date = new Date(),
 ): AttendanceTrendPoint[] {
   return items
-    .flatMap((item) => {
+    .map((item) => {
       const meetingDate = new Date(item.fecha);
-      if (Number.isNaN(meetingDate.getTime())) return [];
-      if (meetingDate.getTime() > now.getTime()) return [];
-      return [
-        {
+      return {
           meetingDate,
           point: {
             key: item.charla_id,
@@ -222,14 +219,18 @@ export function buildConfirmandoAttendanceTrend(
             total: 1,
             attendancePercentage: item.presente ? 100 : 0,
           },
-        },
-      ];
+      };
     })
-    .sort(
-      (left, right) =>
-        left.meetingDate.getTime() - right.meetingDate.getTime() ||
-        left.point.key.localeCompare(right.point.key),
-    )
+    .sort((left, right) => {
+      const leftTime = left.meetingDate.getTime();
+      const rightTime = right.meetingDate.getTime();
+      const leftInvalid = Number.isNaN(leftTime);
+      const rightInvalid = Number.isNaN(rightTime);
+
+      if (leftInvalid !== rightInvalid) return leftInvalid ? 1 : -1;
+      if (!leftInvalid && leftTime !== rightTime) return leftTime - rightTime;
+      return left.point.key.localeCompare(right.point.key);
+    })
     .map(({ point }) => point);
 }
 

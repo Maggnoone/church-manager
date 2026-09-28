@@ -427,7 +427,14 @@ export function useAsistenciaResumen() {
           return conf.group_id === charla.group_id;
         });
 
-        const presentes = asistencias.filter((a) => a.presente).length;
+        const presentePorConfirmando = new Map<string, boolean>();
+        for (const row of asistencias) {
+          presentePorConfirmando.set(
+            row.confirmando_id,
+            (presentePorConfirmando.get(row.confirmando_id) ?? false) || row.presente,
+          );
+        }
+        const presentes = [...presentePorConfirmando.values()].filter(Boolean).length;
         const total_confirmandos = relevantConfirmandos.length;
 
         return {
@@ -474,10 +481,15 @@ export function useAsistenciaPorConfirmando() {
         const registeredCharlas = charlas ?? [];
         const registeredCharlaIds = new Set(registeredCharlas.map((ch) => ch.id));
 
-        const relevantAsistencia = (asistencia ?? []).filter(
-          (a) => a.confirmando_id === c.id && registeredCharlaIds.has(a.charla_id),
-        );
-        const asistidas = relevantAsistencia.filter((a) => a.presente).length;
+        const asistenciaPorCharla = new Map<string, boolean>();
+        for (const row of asistencia ?? []) {
+          if (row.confirmando_id !== c.id || !registeredCharlaIds.has(row.charla_id)) continue;
+          asistenciaPorCharla.set(
+            row.charla_id,
+            (asistenciaPorCharla.get(row.charla_id) ?? false) || row.presente,
+          );
+        }
+        const asistidas = [...asistenciaPorCharla.values()].filter(Boolean).length;
         const total = registeredCharlas.length;
         const fullName = c.full_name;
         const grupo =
@@ -516,13 +528,37 @@ export function useAsistenciaHistorial(confirmandoId: string | null) {
     queryKey: ["asistencia-historial", confirmandoId],
     queryFn: async () => {
       if (!confirmandoId) return [];
-      const { data, error } = await supabase
-        .from("asistencia")
-        .select("*, charlas(id, titulo, fecha, tipo)")
-        .eq("confirmando_id", confirmandoId)
-        .order("fecha", { foreignTable: "charlas", ascending: false });
-      if (error) throw error;
-      return (data ?? []) as AsistenciaHistorialItem[];
+      const [{ data: asistencia, error: asistenciaError }, { data: charlas, error: charlasError }] =
+        await Promise.all([
+          supabase
+            .from("asistencia")
+            .select("*")
+            .eq("confirmando_id", confirmandoId),
+          supabase.from("charlas").select("id, titulo, fecha, tipo").order("fecha", { ascending: false }),
+        ]);
+      if (asistenciaError) throw asistenciaError;
+      if (charlasError) throw charlasError;
+
+      const attendanceByTalk = new Map<string, (typeof asistencia)[number]>();
+      for (const row of asistencia ?? []) {
+        const existing = attendanceByTalk.get(row.charla_id);
+        if (!existing || (!existing.presente && row.presente)) {
+          attendanceByTalk.set(row.charla_id, row);
+        }
+      }
+
+      return (charlas ?? []).map((charla) => {
+        const row = attendanceByTalk.get(charla.id);
+        return {
+          id: row?.id ?? `missing-${charla.id}`,
+          charla_id: charla.id,
+          confirmando_id: confirmandoId,
+          presente: row?.presente ?? false,
+          notas: row?.notas ?? null,
+          created_at: row?.created_at ?? "",
+          charlas: charla,
+        };
+      }) as AsistenciaHistorialItem[];
     },
     enabled: !!confirmandoId,
   });

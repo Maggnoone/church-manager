@@ -104,6 +104,9 @@ describe("useAsistenciaHistorial", () => {
   });
 
   it("fetches historial with correct query key when confirmandoId is provided", async () => {
+    mockResponses.charlas = [
+      { id: "c1", titulo: "Charla 1", fecha: "2026-01-15", tipo: "teorica" },
+    ];
     const { result } = renderHook(() => useAsistenciaHistorial("conf-1"), { wrapper });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -112,6 +115,28 @@ describe("useAsistenciaHistorial", () => {
 
     const { supabase } = await import("@/integrations/supabase/client");
     expect(supabase.from).toHaveBeenCalledWith("asistencia");
+  });
+
+  it("includes every registered talk and marks missing attendance as absent", async () => {
+    mockResponses.charlas = [
+      { id: "c1", titulo: "Charla 1", fecha: "2026-01-15", tipo: "teorica", group_id: "g1" },
+      { id: "c2", titulo: "Charla 2", fecha: "2026-01-22", tipo: "teorica", group_id: "g2" },
+    ];
+    mockResponses.asistencia = [
+      { id: "a1", charla_id: "c1", confirmando_id: "conf-1", presente: true },
+    ];
+
+    const { result } = renderHook(() => useAsistenciaHistorial("conf-1"), { wrapper });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data?.map(({ charla_id, presente, charlas: charla }) => ({
+      charla_id,
+      presente,
+      titulo: charla?.titulo,
+    }))).toEqual([
+      { charla_id: "c1", presente: true, titulo: "Charla 1" },
+      { charla_id: "c2", presente: false, titulo: "Charla 2" },
+    ]);
   });
 });
 
@@ -183,6 +208,7 @@ describe("useAsistenciaPorConfirmando", () => {
     ];
     mockResponses.asistencia = [
       { id: "a1", charla_id: "c1", confirmando_id: "conf-1", presente: true },
+      { id: "a1-duplicate", charla_id: "c1", confirmando_id: "conf-1", presente: true },
       { id: "a2", charla_id: "c2", confirmando_id: "conf-1", presente: true },
       { id: "a3", charla_id: "c3", confirmando_id: "conf-1", presente: true },
       { id: "a4", charla_id: "c5", confirmando_id: "conf-1", presente: true },

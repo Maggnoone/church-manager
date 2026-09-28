@@ -339,9 +339,9 @@ function AsistenciaSection() {
                 <TableRow>
                   <TableHead>Confirmando</TableHead>
                   <TableHead>Grupo</TableHead>
-                  <TableHead>Asistidas</TableHead>
+                  <TableHead>Charlas asistidas</TableHead>
                   <TableHead>Ausencias</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead>Total charlas</TableHead>
                   <TableHead>%</TableHead>
                 </TableRow>
               </TableHeader>
@@ -424,9 +424,9 @@ function AsistenciaSection() {
                         <span>{c.grupo ?? "—"}</span>
                       </div>
                       <div className="flex items-start justify-between gap-2 text-sm">
-                        <span className="text-muted-foreground">Asistidas / Ausencias</span>
+                        <span className="text-muted-foreground">Asistidas / Ausencias / Total charlas</span>
                         <span>
-                          {c.asistidas} / {c.ausencias}
+                          {c.asistidas} / {c.ausencias} / {c.total_sesiones}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
