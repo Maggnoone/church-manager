@@ -286,6 +286,18 @@ export function useGruposSimple() {
 
 /* ── Asistencia ── */
 
+export function useAsistencias(options?: { enabled?: boolean }) {
+  return useQuery<Asistencia[]>({
+    queryKey: ["asistencias"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("asistencia").select("*");
+      if (error) throw error;
+      return (data ?? []) as Asistencia[];
+    },
+    enabled: options?.enabled ?? true,
+  });
+}
+
 export function useAsistencia(charlaId: string) {
   return useQuery<Asistencia[]>({
     queryKey: ["asistencia", charlaId],
@@ -381,20 +393,18 @@ export interface AsistenciaResumen {
 }
 
 export function useAsistenciaResumen() {
+  const { data: asistencia = [] } = useAsistencias();
   return useQuery<AsistenciaResumen[]>({
-    queryKey: ["asistencia-resumen"],
+    queryKey: ["asistencia-resumen", asistencia],
     queryFn: async () => {
       const [
         { data: charlas, error: charlaErr },
-        { data: asistencia, error: asistErr },
         { data: confirmandos, error: confErr },
       ] = await Promise.all([
         supabase.from("charlas").select("*, grupos(nombre)").order("fecha", { ascending: false }),
-        supabase.from("asistencia").select("*"),
         supabase.from("confirmandos").select("id, group_id"),
       ]);
       if (charlaErr) throw charlaErr;
-      if (asistErr) throw asistErr;
       if (confErr) throw confErr;
 
       const confirmandoIds = new Set((confirmandos ?? []).map((c) => c.id));
@@ -447,8 +457,9 @@ export interface AsistenciaPorConfirmando {
 }
 
 export function useAsistenciaPorConfirmando() {
+  const { data: asistencia = [] } = useAsistencias();
   return useQuery<AsistenciaPorConfirmando[]>({
-    queryKey: ["asistencia-por-confirmando"],
+    queryKey: ["asistencia-por-confirmando", asistencia],
     queryFn: async () => {
       const { data: confirmandos, error: cErr } = await supabase
         .from("confirmandos")
@@ -458,9 +469,6 @@ export function useAsistenciaPorConfirmando() {
 
       const { data: charlas, error: chErr } = await supabase.from("charlas").select("id, group_id");
       if (chErr) throw chErr;
-
-      const { data: asistencia, error: aErr } = await supabase.from("asistencia").select("*");
-      if (aErr) throw aErr;
 
       return (confirmandos ?? []).map((c) => {
         const registeredCharlas = charlas ?? [];

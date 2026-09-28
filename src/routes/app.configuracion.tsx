@@ -44,6 +44,21 @@ function ConfigPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const removeGrupo = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("grupos").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Grupo eliminado. Los confirmandos y las charlas asociados quedaron sin grupo.");
+      qc.invalidateQueries({ queryKey: ["grupos"] });
+      qc.invalidateQueries({ queryKey: ["grupos-simple"] });
+      qc.invalidateQueries({ queryKey: ["confirmandos"] });
+      qc.invalidateQueries({ queryKey: ["charlas"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const saveRol = useMutation({
     mutationFn: async () => {
       const payload: UserRole = { user_id: rolForm.user_id, role: rolForm.role, id: "", created_at: "" };
@@ -77,14 +92,14 @@ function ConfigPage() {
           {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
             <Table>
-              <TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>Año</TableHead><TableHead>Descripción</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>Año</TableHead><TableHead>Descripción</TableHead><TableHead className="text-right">Acciones</TableHead></TableRow></TableHeader>
               <TableBody>
                 {loadingGrupos ? (
-                  <TableRow><TableCell colSpan={3} className="py-0"><TableSkeleton cols={3} rows={3} /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="py-0"><TableSkeleton cols={4} rows={3} /></TableCell></TableRow>
                 ) : grupos.length === 0 ? (
-                  <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No hay grupos creados.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">No hay grupos creados.</TableCell></TableRow>
                 ) : (
-                  grupos.map((g) => <TableRow key={g.id}><TableCell className="font-medium">{g.nombre}</TableCell><TableCell>{g.anio}</TableCell><TableCell className="text-muted-foreground">{g.descripcion ?? "—"}</TableCell></TableRow>)
+                  grupos.map((g) => <TableRow key={g.id}><TableCell className="font-medium">{g.nombre}</TableCell><TableCell>{g.anio}</TableCell><TableCell className="text-muted-foreground">{g.descripcion ?? "—"}</TableCell><TableCell className="text-right"><DeleteDialog title={`¿Eliminar el grupo "${g.nombre}"?`} description="Los confirmandos y las charlas asociados no se eliminarán, pero quedarán sin grupo." trigger={<Button size="icon" variant="ghost" title={`Eliminar grupo ${g.nombre}`} aria-label={`Eliminar grupo ${g.nombre}`} disabled={removeGrupo.isPending}><Trash2 className="h-4 w-4 text-destructive" /></Button>} onConfirm={() => removeGrupo.mutate(g.id)} isPending={removeGrupo.isPending} /></TableCell></TableRow>)
                 )}
               </TableBody>
             </Table>
@@ -105,6 +120,7 @@ function ConfigPage() {
                     <span className="font-semibold">{g.nombre}</span>
                     <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Año</span><span>{g.anio}</span></div>
                     <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Descripción</span><span className="text-muted-foreground">{g.descripcion ?? "—"}</span></div>
+                    <div className="flex justify-end pt-1"><DeleteDialog title={`¿Eliminar el grupo "${g.nombre}"?`} description="Los confirmandos y las charlas asociados no se eliminarán, pero quedarán sin grupo." trigger={<Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={removeGrupo.isPending}><Trash2 className="mr-2 h-4 w-4" />Eliminar grupo</Button>} onConfirm={() => removeGrupo.mutate(g.id)} isPending={removeGrupo.isPending} /></div>
                   </CardContent>
                 </Card>
               ))

@@ -66,7 +66,9 @@ function AsistenciaPage() {
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["asistencia", charlaId] });
+      qc.invalidateQueries({ queryKey: ["asistencias"] });
       qc.invalidateQueries({ queryKey: ["asistencia-resumen"] });
+      qc.invalidateQueries({ queryKey: ["asistencia-por-confirmando"] });
     },
   });
 

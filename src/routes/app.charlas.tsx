@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import { formatDateTime } from "@/lib/export";
 import { localDateTimeFields, localDateTimeToISOString, timestampToLocalDateTimeFields } from "@/lib/session-date-time";
 import { useAuth } from "@/hooks/use-auth";
-import { useCharlas } from "@/hooks/use-data";
+import { useCharlas, useGruposSimple } from "@/hooks/use-data";
 import type { Charla, CharlaInsert, SessionType } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/app/charlas")({ component: CharlasPage });
@@ -41,6 +41,7 @@ const schema = z.object({
   ponente: z.string().max(120).optional().or(z.literal("")),
   ubicacion: z.string().max(120).optional().or(z.literal("")),
   tipo: z.enum(["charla", "convivencia", "retiro", "celebracion"]),
+  group_id: z.string().nullable(),
 });
 type FormValues = z.infer<typeof schema>;
 
@@ -51,6 +52,8 @@ function CharlasPage() {
   const [editing, setEditing] = useState<Charla | null>(null);
 
   const { data: rows = [], isLoading } = useCharlas();
+  const { data: grupos = [] } = useGruposSimple();
+  const groupNames = new Map(grupos.map((grupo) => [grupo.id, grupo.nombre]));
 
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(rows.length / LIST_PAGE_SIZE));
@@ -59,13 +62,34 @@ function CharlasPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { titulo: "", duracion_min: 60, tipo: "charla", fecha: "", hora: "", minuto: "00", periodo: "AM" },
+    defaultValues: {
+      titulo: "",
+      duracion_min: 60,
+      tipo: "charla",
+      fecha: "",
+      hora: "",
+      minuto: "00",
+      periodo: "AM",
+      group_id: null,
+    },
   });
 
   const openNew = () => {
     const time = localDateTimeFields(new Date());
     setEditing(null);
-    form.reset({ titulo: "", descripcion: "", duracion_min: 60, tipo: "charla", ponente: "", ubicacion: "", fecha: time.date, hora: time.hour, minuto: time.minute, periodo: time.period });
+    form.reset({
+      titulo: "",
+      descripcion: "",
+      duracion_min: 60,
+      tipo: "charla",
+      ponente: "",
+      ubicacion: "",
+      fecha: time.date,
+      hora: time.hour,
+      minuto: time.minute,
+      periodo: time.period,
+      group_id: null,
+    });
     setOpen(true);
   };
   const openEdit = (r: Charla) => {
@@ -82,6 +106,7 @@ function CharlasPage() {
       ponente: r.ponente ?? "",
       ubicacion: r.ubicacion ?? "",
       tipo: r.tipo,
+      group_id: r.group_id ?? null,
     });
     setOpen(true);
   };
@@ -94,6 +119,7 @@ function CharlasPage() {
     descripcion: v.descripcion || null,
     ponente: v.ponente || null,
     ubicacion: v.ubicacion || null,
+    group_id: v.group_id,
   });
 
   const save = useMutation({
@@ -102,7 +128,12 @@ function CharlasPage() {
       const { error } = editing ? await supabase.from("charlas").update(payload).eq("id", editing.id) : await supabase.from("charlas").insert(payload);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Guardado"); qc.invalidateQueries({ queryKey: ["charlas"] }); setOpen(false); },
+    onSuccess: () => {
+      toast.success("Guardado");
+      qc.invalidateQueries({ queryKey: ["charlas"] });
+      qc.invalidateQueries({ queryKey: ["asistencia-resumen"] });
+      setOpen(false);
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -130,18 +161,34 @@ function CharlasPage() {
           {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
             <Table>
-              <TableHeader><TableRow><TableHead>Fecha</TableHead><TableHead>Título</TableHead><TableHead>Tipo</TableHead><TableHead>Ponente</TableHead><TableHead>Ubicación</TableHead><TableHead className="text-right">Acciones</TableHead></TableRow></TableHeader>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Ponente</TableHead>
+                  <TableHead>Ubicación</TableHead>
+                  <TableHead>Grupo</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow><TableCell colSpan={6} className="py-0"><TableSkeleton cols={6} rows={5} /></TableCell></TableRow>
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-0">
+                      <TableSkeleton cols={7} rows={5} />
+                    </TableCell>
+                  </TableRow>
                 ) : rows.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     <div className="flex flex-col items-center gap-2">
                       <Inbox className="h-8 w-8 opacity-40" />
                       <p>No hay sesiones programadas.</p>
                       <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva sesión</Button>
                     </div>
-                  </TableCell></TableRow>
+                    </TableCell>
+                  </TableRow>
                 ) : paginated.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell>{formatDateTime(r.fecha)}</TableCell>
@@ -149,6 +196,7 @@ function CharlasPage() {
                     <TableCell><Badge variant={tipoColor[r.tipo] ?? "outline"}>{r.tipo}</Badge></TableCell>
                     <TableCell>{r.ponente ?? "—"}</TableCell>
                     <TableCell>{r.ubicacion ?? "—"}</TableCell>
+                    <TableCell>{(r.group_id && groupNames.get(r.group_id)) || "—"}</TableCell>
                     <TableCell className="text-right">
                       <Button size="icon" variant="ghost" aria-label={`Editar charla ${r.titulo}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
                       {isAdmin && (
@@ -212,6 +260,10 @@ function CharlasPage() {
                     <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Tipo</span><Badge variant={tipoColor[r.tipo] ?? "outline"}>{r.tipo}</Badge></div>
                     <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Ponente</span><span>{r.ponente ?? "—"}</span></div>
                     <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Ubicación</span><span>{r.ubicacion ?? "—"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm">
+                      <span className="text-muted-foreground">Grupo</span>
+                      <span>{(r.group_id && groupNames.get(r.group_id)) || "—"}</span>
+                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -269,6 +321,27 @@ function CharlasPage() {
               </SelectContent>
             </Select>
             <FieldError name="tipo" form={form} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="grupo">Grupo</Label>
+            <Select
+              value={form.watch("group_id") ?? "sin-grupo"}
+              onValueChange={(value) =>
+                form.setValue("group_id", value === "sin-grupo" ? null : value)
+              }
+            >
+              <SelectTrigger id="grupo" aria-label="Grupo">
+                <SelectValue placeholder="Sin grupo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sin-grupo">Sin grupo</SelectItem>
+                {grupos.map((grupo) => (
+                  <SelectItem key={grupo.id} value={grupo.id}>
+                    {grupo.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <Label htmlFor="ponente">Ponente</Label>
