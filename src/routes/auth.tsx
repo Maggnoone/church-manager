@@ -32,18 +32,16 @@ function AuthPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-
-  if (!loading && user) return <Navigate to="/app" />;
-
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
-
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: { email: "", password: "", fullName: "" },
   });
+
+  if (!loading && user) return <Navigate to="/app" />;
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setSubmitting(true);

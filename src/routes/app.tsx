@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Outlet, Navigate, useRouterState } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Search } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -73,18 +73,15 @@ function AppLayout() {
             {reduceMotion ? (
               <Outlet />
             ) : (
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={pathname}
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="min-w-0"
-                >
-                  <Outlet />
-                </motion.div>
-              </AnimatePresence>
+              <motion.div
+                key={pathname}
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                className="min-w-0"
+              >
+                <Outlet />
+              </motion.div>
             )}
           </main>
         </div>
