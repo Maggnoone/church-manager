@@ -152,10 +152,10 @@ function AsistenciaPage() {
         <CardHeader><CardTitle className="text-base">Sesión</CardTitle></CardHeader>
         <CardContent>
           <Select value={charlaId} onValueChange={setCharlaId}>
-            <SelectTrigger><SelectValue placeholder="Selecciona una charla" /></SelectTrigger>
-            <SelectContent>
+            <SelectTrigger className="min-w-0 gap-2 overflow-hidden [&>span]:min-w-0 [&>span]:flex-1 [&>svg]:shrink-0"><SelectValue placeholder="Selecciona una charla" /></SelectTrigger>
+            <SelectContent className="max-w-[calc(100vw-2rem)]">
               {charlas.map((c) => (
-                <SelectItem key={c.id} value={c.id}>{formatDateTime(c.fecha)} — {c.titulo}</SelectItem>
+                <SelectItem key={c.id} value={c.id} className="min-w-0 items-start py-2 text-left [&>span:last-child]:min-w-0 [&>span:last-child]:flex-1 [&>span:last-child]:whitespace-normal [&>span:last-child]:break-words [&>span:last-child]:line-clamp-2 [&>span:last-child]:leading-snug max-[375px]:[&>span:last-child]:text-[13px]">{formatDateTime(c.fecha)} — {c.titulo}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -182,10 +182,10 @@ function AsistenciaPage() {
             <div className="flex flex-wrap items-center gap-2 min-w-0">
               <Badge className="bg-success hover:bg-success/90 text-success-foreground">{presentes} presentes</Badge>
               <Badge variant="destructive">{filteredConfirmandos.length - presentes} ausentes</Badge>
-              <div className="flex flex-wrap items-center gap-1">
-                <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md"><Download className="h-4 w-4" /><span className="hidden sm:inline ml-1">CSV</span></Button>
-                <Button variant="outline" size="sm" onClick={handleExportXLSX} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md"><FileSpreadsheet className="h-4 w-4" /><span className="hidden sm:inline ml-1">Excel</span></Button>
-                <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md"><FileText className="h-4 w-4" /><span className="hidden sm:inline ml-1">PDF</span></Button>
+              <div className="flex flex-wrap items-center gap-1 max-md:w-full max-md:px-1">
+                <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md max-md:flex-1"><Download className="h-4 w-4" /><span className="ml-1">CSV</span></Button>
+                <Button variant="outline" size="sm" onClick={handleExportXLSX} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md max-md:flex-1"><FileSpreadsheet className="h-4 w-4" /><span className="ml-1">Excel</span></Button>
+                <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md max-md:flex-1"><FileText className="h-4 w-4" /><span className="ml-1">PDF</span></Button>
               </div>
             </div>
           </CardHeader>
@@ -196,13 +196,13 @@ function AsistenciaPage() {
               paginatedConfirmandos.map((c) => {
                 const a = asistMap.get(c.id);
                 return (
-                  <div key={c.id} className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-soft">
-                    <div className="min-w-0">
-                      <span className="font-medium block truncate">{c.full_name}</span>
-                      <span className="text-xs text-muted-foreground">{c.grupos?.nombre ?? "Sin grupo"}</span>
+                  <div key={c.id} className="flex items-center justify-between gap-2 rounded-lg border bg-card p-3 shadow-soft max-[375px]:gap-1.5 max-[375px]:rounded-md max-[375px]:p-2">
+                    <div className="min-w-0 flex-1 pr-2 max-[375px]:pr-1">
+                      <span className="block min-w-0 break-words font-medium text-[15px] leading-snug line-clamp-2 sm:line-clamp-none sm:truncate sm:text-base max-[375px]:text-[13px] max-[375px]:leading-tight">{c.full_name}</span>
+                      <span className="block truncate text-xs text-muted-foreground max-[375px]:text-[11px]">{c.grupos?.nombre ?? "Sin grupo"}</span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className={`text-xs font-semibold ${a?.presente ? "text-success" : "text-destructive"}`}>{a?.presente ? "Presente" : "Ausente"}</span>
+                    <div className="flex items-center gap-2 shrink-0 max-[375px]:gap-1.5">
+                      <span className={`text-xs font-semibold max-[375px]:text-[11px] ${a?.presente ? "text-success" : "text-destructive"}`}>{a?.presente ? "Presente" : "Ausente"}</span>
                       <Switch checked={!!a?.presente} onCheckedChange={(v) => toggle.mutate({ confirmando_id: c.id, presente: v })} />
                     </div>
                   </div>

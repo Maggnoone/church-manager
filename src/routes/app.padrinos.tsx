@@ -92,14 +92,14 @@ function PadrinosPage() {
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Padrinos y Madrinas</h1>
+          <h1 className="font-display text-2xl font-semibold sm:text-3xl">Padrinos y Madrinas</h1>
           <p className="text-sm text-muted-foreground">Registro completo de padrinos disponibles.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => exportToXLSX(rows.map((r) => ({ Nombre: r.full_name, DNI: r.dni, Teléfono: r.telefono, Email: r.email, Parentesco: r.parentesco, Confirmado: r.has_confirmation ? "Sí" : "No" })), "padrinos")}>
+        <div className="flex flex-wrap gap-2 max-sm:w-full">
+          <Button variant="outline" className="max-sm:flex-1" onClick={() => exportToXLSX(rows.map((r) => ({ Nombre: r.full_name, DNI: r.dni, Teléfono: r.telefono, Email: r.email, Parentesco: r.parentesco, Confirmado: r.has_confirmation ? "Sí" : "No" })), "padrinos")}>
             <Download className="mr-2 h-4 w-4" />Exportar
           </Button>
-          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
+          <Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
         </div>
       </div>
 
@@ -167,10 +167,10 @@ function PadrinosPage() {
             ) : (
               paginated.map((r) => (
                 <Card key={r.id} className="shadow-soft">
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">{r.full_name}</span>
-                      <div className="flex gap-1">
+                  <CardContent className="p-4 space-y-2 max-[375px]:p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug max-[375px]:text-[13px]">{r.full_name}</span>
+                      <div className="flex shrink-0 gap-1">
                         <Button size="icon" variant="ghost" aria-label={`Editar padrino ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
                         {isAdmin && (
                           <DeleteDialog
@@ -187,10 +187,10 @@ function PadrinosPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">DNI</span><span>{r.dni ?? "—"}</span></div>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Teléfono</span><span>{r.telefono ?? "—"}</span></div>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Parentesco</span><span>{r.parentesco ?? "—"}</span></div>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Confirmado</span><span>{r.has_confirmation ? "Sí" : "No"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">DNI</span><span className="min-w-0 truncate text-right">{r.dni ?? "—"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Teléfono</span><span className="min-w-0 truncate text-right">{r.telefono ?? "—"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Parentesco</span><span className="min-w-0 truncate text-right">{r.parentesco ?? "—"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Confirmado</span><span>{r.has_confirmation ? "Sí" : "No"}</span></div>
                   </CardContent>
                 </Card>
               ))

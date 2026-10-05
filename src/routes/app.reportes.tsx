@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -167,10 +168,11 @@ function AsistenciaSection() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-md:w-full max-md:px-1">
           <Button
             size="sm"
             variant={subTab === "charla" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("charla");
               setPage(1);
@@ -182,6 +184,7 @@ function AsistenciaSection() {
           <Button
             size="sm"
             variant={subTab === "confirmando" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("confirmando");
               setPage(1);
@@ -191,25 +194,30 @@ function AsistenciaSection() {
             Por confirmando
           </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <select
-            className="rounded-md border bg-background px-2 py-1 text-sm max-w-full"
-            value={groupFilter}
-            onChange={(e) => {
-              setGroupFilter(e.target.value);
+        <div className="flex items-center gap-2 max-md:w-full max-md:px-1">
+          <Select
+            value={groupFilter || "all"}
+            onValueChange={(v) => {
+              setGroupFilter(v === "all" ? "" : v);
               setPage(1);
             }}
           >
-            <option value="">Todos los grupos</option>
-            {grupos.map((g) => (
-              <option key={g.id} value={g.nombre ?? ""}>
-                {g.nombre}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="min-w-0 flex-1 sm:w-[200px] sm:flex-none">
+              <SelectValue placeholder="Todos los grupos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los grupos</SelectItem>
+              {grupos.map((g) => (
+                <SelectItem key={g.id} value={g.nombre ?? ""}>
+                  {g.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button
             size="sm"
             variant="outline"
+            className="max-md:flex-1"
             onClick={() => {
               if (subTab === "charla") {
                 runExport("xlsx", "Asistencia por Charla", exportRowsCharla(), "asistencia-charla");
@@ -229,7 +237,7 @@ function AsistenciaSection() {
         </div>
       </div>
 
-      <AttendanceTrendChart data={attendanceTrend} isLoading={loadingCharlas} />
+      <AttendanceTrendChart data={attendanceTrend} isLoading={loadingCharlas} className="hidden md:block" />
 
       {/* ── Por charla ── */}
       {subTab === "charla" && (
@@ -1231,7 +1239,7 @@ function ReportesPage() {
       </div>
 
       <Tabs defaultValue="asistencia">
-        <TabsList className="w-full h-auto flex-wrap">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl p-1.5 sm:inline-flex sm:h-10 sm:flex-wrap sm:rounded-full sm:p-1 sm:gap-0 [&>button]:min-w-0 [&>button]:w-full [&>button]:px-2 sm:[&>button]:w-auto sm:[&>button]:px-4 [&>button_svg]:shrink-0">
           <TabsTrigger value="asistencia">
             <ClipboardList className="mr-2 h-4 w-4" />
             Asistencia

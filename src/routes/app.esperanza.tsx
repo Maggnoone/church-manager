@@ -224,14 +224,17 @@ function EsperanzaPage() {
             Listado independiente de miembros de Esperanza.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="px-3 py-1 text-sm">
+        <div className="flex flex-wrap items-center gap-2 max-md:w-full max-md:px-1">
+          <Badge
+            variant="secondary"
+            className="px-3 py-1 text-sm max-md:flex-1 max-md:justify-center"
+          >
             <Heart className="mr-1 h-3.5 w-3.5" />
             {filtered.length} {filtered.length === 1 ? "miembro" : "miembros"}
           </Badge>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="max-md:flex-1">
                 <Download className="mr-2 h-4 w-4" />
                 Exportar
               </Button>
@@ -251,7 +254,7 @@ function EsperanzaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={openNew}>
+          <Button onClick={openNew} className="max-md:w-full">
             <Plus className="mr-2 h-4 w-4" />
             Nuevo miembro
           </Button>
@@ -334,7 +337,7 @@ function EsperanzaPage() {
                       <TableCell>{m.dni ?? "—"}</TableCell>
                       <TableCell>{m.telefono ?? "—"}</TableCell>
                       <TableCell>{formatDate(m.fecha_nacimiento)}</TableCell>
-                      <TableCell>{m.email ?? "—"}</TableCell>
+                      <TableCell className="max-w-[220px]"><span className="block truncate" title={m.email ?? undefined}>{m.email ?? "—"}</span></TableCell>
                       <TableCell>
                         <Badge variant={m.activo ? "default" : "secondary"}>
                           {m.activo ? "Activo" : "Inactivo"}
@@ -446,8 +449,8 @@ function EsperanzaPage() {
                       <span>{formatDate(m.fecha_nacimiento)}</span>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">Email</span>
-                      <span>{m.email ?? "—"}</span>
+                      <span className="shrink-0 text-muted-foreground">Email</span>
+                      <span className="min-w-0 flex-1 truncate text-right" title={m.email ?? undefined}>{m.email ?? "—"}</span>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm">
                       <span className="text-muted-foreground">Estado</span>

@@ -190,13 +190,13 @@ function ConfirmandosPage() {
     <div className="mx-auto max-w-7xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Confirmandos</h1>
+          <h1 className="font-display text-2xl font-semibold sm:text-3xl">Confirmandos</h1>
           <p className="text-sm text-muted-foreground">Gestión completa de los jóvenes en formación.</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 max-sm:w-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline"><Download className="mr-2 h-4 w-4" />Exportar</Button>
+              <Button variant="outline" className="max-sm:flex-1"><Download className="mr-2 h-4 w-4" />Exportar</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleExport("xlsx")}><FileSpreadsheet className="mr-2 h-4 w-4" />Excel (.xlsx)</DropdownMenuItem>
@@ -204,7 +204,7 @@ function ConfirmandosPage() {
               <DropdownMenuItem onClick={() => handleExport("csv")}><FileType className="mr-2 h-4 w-4" />CSV</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
+          <Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
         </div>
       </div>
 
@@ -330,10 +330,10 @@ function ConfirmandosPage() {
             ) : (
               paginated.map((r) => (
                 <Card key={r.id} className="shadow-soft">
-                  <CardContent className="p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">{r.full_name}</span>
-                      <div className="flex gap-1">
+                  <CardContent className="p-4 space-y-2 max-[375px]:p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug max-[375px]:text-[13px]">{r.full_name}</span>
+                      <div className="flex shrink-0 gap-1">
                         <Button size="icon" variant="ghost" aria-label={`Editar confirmando ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
                         {isAdmin && (
                           <DeleteDialog
@@ -350,27 +350,27 @@ function ConfirmandosPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">DNI</span>
-                      <span>{r.dni ?? "—"}</span>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
+                      <span className="shrink-0 text-muted-foreground">DNI</span>
+                      <span className="min-w-0 truncate text-right">{r.dni ?? "—"}</span>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">Grupo</span>
-                      <span>{r.grupos?.nombre ?? "—"}</span>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
+                      <span className="shrink-0 text-muted-foreground">Grupo</span>
+                      <span className="min-w-0 truncate text-right">{r.grupos?.nombre ?? "—"}</span>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">Padrino</span>
-                      <span>{r.padrinos?.full_name ?? <span className="text-muted-foreground">Sin asignar</span>}</span>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
+                      <span className="shrink-0 text-muted-foreground">Padrino</span>
+                      <span className="min-w-0 truncate text-right">{r.padrinos?.full_name ?? <span className="text-muted-foreground">Sin asignar</span>}</span>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">Sacramentos</span>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
+                      <span className="shrink-0 text-muted-foreground">Sacramentos</span>
                       <div className="flex gap-1">
                         <Badge variant={r.has_baptism ? "default" : "outline"}>B</Badge>
                         <Badge variant={r.has_communion ? "default" : "outline"}>C</Badge>
                       </div>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">Estado</span>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
+                      <span className="shrink-0 text-muted-foreground">Estado</span>
                       <Badge variant={r.status === "confirmado" ? "default" : r.status === "apto" ? "secondary" : "outline"}>
                         {r.status}
                       </Badge>

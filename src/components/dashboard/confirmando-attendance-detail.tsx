@@ -191,16 +191,18 @@ export function ConfirmandoAttendanceDetail({
                   </Card>
                 </div>
 
-                {/* Trend chart */}
-                <AttendanceTrendChart data={chartSlice} isLoading={false} className="shadow-soft" />
-                <ListPagination
-                  page={chartPage}
-                  totalPages={chartTotalPages}
-                  total={trend.length}
-                  itemLabel="fechas de asistencia"
-                  onPageChange={setChartPage}
-                  pageSize={CHART_PAGE_SIZE}
-                />
+                {/* Trend chart (solo desktop) */}
+                <div className="hidden space-y-4 md:block">
+                  <AttendanceTrendChart data={chartSlice} isLoading={false} className="shadow-soft" />
+                  <ListPagination
+                    page={chartPage}
+                    totalPages={chartTotalPages}
+                    total={trend.length}
+                    itemLabel="fechas de asistencia"
+                    onPageChange={setChartPage}
+                    pageSize={CHART_PAGE_SIZE}
+                  />
+                </div>
 
                 {/* Sessions table / cards */}
                 <div className="space-y-3">
