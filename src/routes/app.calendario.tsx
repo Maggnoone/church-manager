@@ -308,19 +308,15 @@ function CalendarioPage() {
                         "flex min-h-8 min-w-0 flex-col items-center justify-center rounded-md border p-1 text-[10px] transition-colors sm:min-h-12 sm:p-2 sm:text-xs md:min-h-14 max-sm:min-h-0",
                         isSelected && "border-primary bg-primary text-primary-foreground",
                         !isSelected && isToday && "border-primary",
-                        !isSelected && !isToday && "border-transparent bg-secondary/40",
+                        !isSelected && !isToday && hasEvents && "border-primary/60 bg-secondary/40",
+                        !isSelected && !isToday && !hasEvents && "border-transparent bg-secondary/40",
                         !isCurrentMonth && "invisible",
                         isCurrentMonth && !isSelected && "hover:bg-accent/60",
                       )}
                       aria-label={day.toLocaleDateString("es-AR", { day: "numeric", month: "long" })}
                       aria-pressed={isSelected}
                     >
-                      <span className="relative">
-                        {day.getDate()}
-                        {hasEvents && !isSelected && (
-                          <span className="absolute -right-1.5 -top-0.5 block h-1.5 w-1.5 rounded-full bg-primary sm:h-2 sm:w-2" />
-                        )}
-                      </span>
+                      {day.getDate()}
                     </button>
                   );
                 })}

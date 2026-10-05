@@ -28,10 +28,17 @@ export function CharlaDateTimeField({
 }: CharlaDateTimeFieldProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const selectedDate = date ? new Date(`${date}T00:00:00`) : undefined;
+  const [month, setMonth] = useState<Date | undefined>(selectedDate);
 
   return (
     <div className="grid min-w-0 grid-cols-[minmax(0,2fr)_repeat(3,minmax(2.75rem,1fr))] items-center gap-2">
-      <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+      <Popover
+        open={datePickerOpen}
+        onOpenChange={(open) => {
+          setDatePickerOpen(open);
+          if (open) setMonth(selectedDate);
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             type="button"
@@ -48,7 +55,8 @@ export function CharlaDateTimeField({
         <PopoverContent className="z-[60] w-auto p-0" align="start">
           <Calendar
             mode="single"
-            month={selectedDate}
+            month={month ?? selectedDate}
+            onMonthChange={setMonth}
             selected={selectedDate}
             onSelect={(selected) => {
               if (selected) onDateChange(calendarDateToFormDate(selected));
