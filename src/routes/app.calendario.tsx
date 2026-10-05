@@ -21,6 +21,7 @@ import { formatDateTime } from "@/lib/export";
 import { cn } from "@/lib/utils";
 import { useCharlasCalendario } from "@/hooks/use-data";
 import type { Charla } from "@/integrations/supabase/types";
+import { toDateKey, getMonthGridDays, WEEKDAYS } from "@/lib/calendar-grid";
 
 export const Route = createFileRoute("/app/calendario")({ component: CalendarioPage });
 
@@ -34,40 +35,9 @@ function parseLocalDate(value: string): Date {
   return new Date(value);
 }
 
-function toDateKey(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
 function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
-
-function getMonthGridDays(month: Date): Date[] {
-  const year = month.getFullYear();
-  const monthIndex = month.getMonth();
-
-  const firstOfMonth = new Date(year, monthIndex, 1);
-  const dayOfWeek = firstOfMonth.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  const daysFromPrev = (dayOfWeek + 6) % 7;
-
-  const start = new Date(year, monthIndex, 1 - daysFromPrev);
-
-  const lastOfMonth = new Date(year, monthIndex + 1, 0);
-  const lastDayOfWeek = lastOfMonth.getDay();
-  const daysFromNext = (7 - lastDayOfWeek) % 7;
-
-  const end = new Date(year, monthIndex + 1, daysFromNext);
-
-  const days: Date[] = [];
-  const cur = new Date(start);
-  while (cur <= end) {
-    days.push(new Date(cur));
-    cur.setDate(cur.getDate() + 1);
-  }
-  return days;
-}
-
-const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 const tipoColor: Record<string, string> = {
   retiro: "bg-gradient-primary text-primary-foreground",
@@ -201,20 +171,21 @@ function CalendarioPage() {
   const hasEvents = charlas.length > 0;
 
   return (
-    <div className={cn("mx-auto space-y-6", view === "lista" ? "max-w-5xl" : "max-w-7xl")}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className={cn("mx-auto space-y-4 sm:space-y-6", view === "lista" ? "max-w-5xl" : "max-w-7xl")}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Calendario de Formación</h1>
+          <h1 className="font-display text-2xl font-semibold sm:text-3xl">Calendario de Formación</h1>
           <p className="text-sm text-muted-foreground">
             Charlas, convivencias, retiro y celebraciones del año.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 max-sm:w-full">
           <ToggleGroup
             type="single"
             value={view}
             onValueChange={(v) => handleViewChange(v as "lista" | "calendario")}
             aria-label="Cambiar vista"
+            className="max-sm:w-full max-sm:[&>button]:flex-1"
           >
             <ToggleGroupItem value="lista" aria-label="Vista lista">
               <List className="mr-2 h-4 w-4" />
@@ -225,7 +196,7 @@ function CalendarioPage() {
               Calendario
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button asChild>
+          <Button asChild className="max-sm:w-full">
             <Link to="/app/charlas">
               <Plus className="mr-2 h-4 w-4" />
               Nueva sesión
@@ -267,16 +238,17 @@ function CalendarioPage() {
         ))
       ) : (
         <div className="space-y-6">
-          <Card className="shadow-soft">
-            <CardContent className="p-4">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-display text-lg font-semibold capitalize sm:text-xl">
+          <Card className="min-w-0 overflow-hidden shadow-soft">
+            <CardContent className="p-3 sm:p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="font-display text-base font-semibold capitalize sm:text-lg">
                   {month.toLocaleDateString("es-AR", { month: "long", year: "numeric" })}
                 </h2>
                 <div className="flex items-center gap-1">
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8"
                     onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
                     aria-label="Mes anterior"
                   >
@@ -285,6 +257,7 @@ function CalendarioPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="h-8"
                     onClick={() => {
                       const today = new Date();
                       setMonth(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -296,6 +269,7 @@ function CalendarioPage() {
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8"
                     onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
                     aria-label="Mes siguiente"
                   >
@@ -304,82 +278,52 @@ function CalendarioPage() {
                 </div>
               </div>
 
-              <div className="hidden grid-cols-7 gap-px border-b sm:grid">
+              <div className="grid min-w-0 grid-cols-7 gap-0.5 sm:gap-1">
                 {WEEKDAYS.map((d) => (
                   <div
                     key={d}
-                    className="py-2 text-center text-xs font-medium text-muted-foreground sm:text-sm"
+                    className="py-1 text-center text-[10px] font-medium text-muted-foreground sm:text-xs"
                   >
                     {d}
                   </div>
                 ))}
               </div>
+              <div className="mt-0.5 grid min-w-0 grid-cols-7 gap-0.5 sm:mt-1 sm:gap-1 max-sm:h-[calc((100dvh-380px)*0.85)] max-sm:auto-rows-fr">
+                {getMonthGridDays(month).map((day) => {
+                  const key = toDateKey(day);
+                  const hasEvents = (charlasByDateKey[key] ?? []).length > 0;
+                  const isCurrentMonth = day.getMonth() === month.getMonth();
+                  const isSelected = selectedDate ? toDateKey(selectedDate) === key : false;
+                  const isToday = key === toDateKey(new Date());
 
-              <div className="rounded-lg border">
-                <div className="grid min-w-0 w-full grid-cols-7 gap-px bg-muted">
-                  {getMonthGridDays(month).map((day) => {
-                    const key = toDateKey(day);
-                    const dayEvents = charlasByDateKey[key] ?? [];
-                    const isCurrentMonth = day.getMonth() === month.getMonth();
-                    const isSelected = selectedDate ? toDateKey(selectedDate) === key : false;
-                    const isToday = toDateKey(day) === toDateKey(new Date());
-
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => selectDateAndOpen(day)}
-                        className={cn(
-                          "flex min-h-[112px] flex-col items-start gap-1 bg-background p-1.5 text-left transition-colors hover:bg-accent/50 sm:min-h-[96px] sm:p-2",
-                          !isCurrentMonth && "bg-muted/30 text-muted-foreground",
-                          isSelected && "bg-accent",
-                          isToday && !isSelected && "bg-primary/5",
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={!isCurrentMonth}
+                      onClick={() => {
+                        if (isCurrentMonth) selectDateAndOpen(day);
+                      }}
+                      className={cn(
+                        "flex min-h-8 min-w-0 flex-col items-center justify-center rounded-md border p-1 text-[10px] transition-colors sm:min-h-12 sm:p-2 sm:text-xs md:min-h-14 max-sm:min-h-0",
+                        isSelected && "border-primary bg-primary text-primary-foreground",
+                        !isSelected && isToday && "border-primary",
+                        !isSelected && !isToday && "border-transparent bg-secondary/40",
+                        !isCurrentMonth && "invisible",
+                        isCurrentMonth && !isSelected && "hover:bg-accent/60",
+                      )}
+                      aria-label={day.toLocaleDateString("es-AR", { day: "numeric", month: "long" })}
+                      aria-pressed={isSelected}
+                    >
+                      <span className="relative">
+                        {day.getDate()}
+                        {hasEvents && !isSelected && (
+                          <span className="absolute -right-1.5 -top-0.5 block h-1.5 w-1.5 rounded-full bg-primary sm:h-2 sm:w-2" />
                         )}
-                        aria-label={`${day.getDate()} de ${day.toLocaleDateString("es-AR", { month: "long" })}`}
-                        aria-pressed={isSelected}
-                      >
-                        <span
-                          className={cn(
-                            "text-xs font-medium sm:text-sm",
-                            isToday &&
-                              "inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground sm:h-6 sm:w-6 sm:text-sm",
-                          )}
-                        >
-                          {day.getDate()}
-                        </span>
-                        <div className="flex w-full flex-col gap-0.5 sm:gap-1">
-                          {dayEvents.slice(0, 3).map((c) => {
-                            const t = parseLocalDate(c.fecha).toLocaleTimeString("es-AR", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            });
-                            return (
-                              <span
-                                key={c.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  selectDateAndOpen(day);
-                                }}
-                                className={cn(
-                                  "block w-full cursor-pointer truncate rounded px-1 py-0.5 text-[10px] font-medium leading-tight sm:text-xs",
-                                  tipoColor[c.tipo] ?? "bg-muted text-muted-foreground",
-                                )}
-                                title={c.titulo}
-                              >
-                                {t} {c.titulo}
-                              </span>
-                            );
-                          })}
-                          {dayEvents.length > 3 && (
-                            <span className="text-[10px] text-muted-foreground sm:text-xs">
-                              +{dayEvents.length - 3} más
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>

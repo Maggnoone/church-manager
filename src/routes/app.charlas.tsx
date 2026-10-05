@@ -152,7 +152,7 @@ function CharlasPage() {
           <h1 className="font-display text-3xl font-semibold">Charlas y Encuentros</h1>
           <p className="text-sm text-muted-foreground">Itinerario formativo: catequesis, convivencias y retiro.</p>
         </div>
-        <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva</Button>
+        <Button onClick={openNew} className="max-sm:w-full"><Plus className="mr-2 h-4 w-4" />Nueva</Button>
       </div>
 
       <Card className="shadow-soft">

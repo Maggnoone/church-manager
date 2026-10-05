@@ -320,10 +320,10 @@ export function PagosManager({ concepto }: PagosManagerProps) {
           <h1 className="font-display text-3xl font-semibold">{title}</h1>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 max-sm:w-full">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="max-sm:min-w-0 max-sm:flex-[2]">
                 <Download className="mr-2 h-4 w-4" />
                 Exportar
               </Button>
@@ -335,6 +335,7 @@ export function PagosManager({ concepto }: PagosManagerProps) {
           </DropdownMenu>
           <Button
             variant="outline"
+            className="max-sm:min-w-0 max-sm:flex-[3]"
             onClick={() => {
               setCostoMonto(String(activeCosto?.monto ?? ""));
               setOpenCosto(true);
@@ -343,20 +344,20 @@ export function PagosManager({ concepto }: PagosManagerProps) {
             <Wallet className="mr-2 h-4 w-4" />
             Costo: {formatCurrency(activeCosto?.monto ?? 0)}
           </Button>
-          <Button onClick={() => setOpenPago(true)}>
+          <Button onClick={() => setOpenPago(true)} className="max-sm:basis-full">
             <Plus className="mr-2 h-4 w-4" />
             Registrar pago
           </Button>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Ver:</span>
+      <div className="flex items-center gap-2 max-sm:w-full">
+        <span className="shrink-0 text-sm text-muted-foreground">Ver:</span>
         <Select
           value={modo}
           onValueChange={(v) => handleModoChange(v as "confirmandos" | "esperanza")}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40 max-sm:min-w-0 max-sm:flex-1">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

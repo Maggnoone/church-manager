@@ -180,8 +180,8 @@ function AsistenciaPage() {
               </Select>
             </div>
             <div className="flex flex-wrap items-center gap-2 min-w-0">
-              <Badge className="bg-success hover:bg-success/90 text-success-foreground">{presentes} presentes</Badge>
-              <Badge variant="destructive">{filteredConfirmandos.length - presentes} ausentes</Badge>
+              <Badge className="bg-success hover:bg-success/90 text-success-foreground max-sm:flex-1 max-sm:justify-center">{presentes} presentes</Badge>
+              <Badge variant="destructive" className="max-sm:flex-1 max-sm:justify-center">{filteredConfirmandos.length - presentes} ausentes</Badge>
               <div className="flex flex-wrap items-center gap-1 max-md:w-full max-md:px-1">
                 <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md max-md:flex-1"><Download className="h-4 w-4" /><span className="ml-1">CSV</span></Button>
                 <Button variant="outline" size="sm" onClick={handleExportXLSX} disabled={!exportData.length} className="px-2 sm:px-3 rounded-md max-md:flex-1"><FileSpreadsheet className="h-4 w-4" /><span className="ml-1">Excel</span></Button>
