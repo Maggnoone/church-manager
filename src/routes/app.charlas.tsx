@@ -47,7 +47,7 @@ type FormValues = z.infer<typeof schema>;
 
 function CharlasPage() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSecretaria } = useAuth();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Charla | null>(null);
 
@@ -152,7 +152,7 @@ function CharlasPage() {
           <h1 className="font-display text-3xl font-semibold">Charlas y Encuentros</h1>
           <p className="text-sm text-muted-foreground">Itinerario formativo: catequesis, convivencias y retiro.</p>
         </div>
-        <Button onClick={openNew} className="max-sm:w-full"><Plus className="mr-2 h-4 w-4" />Nueva</Button>
+        {!isSecretaria && (<Button onClick={openNew} className="max-sm:w-full"><Plus className="mr-2 h-4 w-4" />Nueva</Button>)}
       </div>
 
       <Card className="shadow-soft">
@@ -185,7 +185,7 @@ function CharlasPage() {
                     <div className="flex flex-col items-center gap-2">
                       <Inbox className="h-8 w-8 opacity-40" />
                       <p>No hay sesiones programadas.</p>
-                      <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva sesión</Button>
+                      {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva sesión</Button>)}
                     </div>
                     </TableCell>
                   </TableRow>
@@ -198,7 +198,7 @@ function CharlasPage() {
                     <TableCell>{r.ubicacion ?? "—"}</TableCell>
                     <TableCell>{(r.group_id && groupNames.get(r.group_id)) || "—"}</TableCell>
                     <TableCell className="text-right">
-                      <Button size="icon" variant="ghost" aria-label={`Editar charla ${r.titulo}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                      {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar charla ${r.titulo}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                       {isAdmin && (
                         <DeleteDialog
                           title={`¿Eliminar charla "${r.titulo}"?`}
@@ -230,7 +230,7 @@ function CharlasPage() {
                 <div className="flex flex-col items-center gap-2">
                   <Inbox className="h-8 w-8 opacity-40" />
                   <p>No hay sesiones programadas.</p>
-                  <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva sesión</Button>
+                  {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nueva sesión</Button>)}
                 </div>
               </div>
             ) : (
@@ -240,7 +240,7 @@ function CharlasPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{r.titulo}</span>
                       <div className="flex gap-1">
-                        <Button size="icon" variant="ghost" aria-label={`Editar charla ${r.titulo}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                        {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar charla ${r.titulo}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                         {isAdmin && (
                           <DeleteDialog
                             title={`¿Eliminar charla "${r.titulo}"?`}

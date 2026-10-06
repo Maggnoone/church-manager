@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
@@ -76,7 +76,7 @@ type FormValues = z.infer<typeof schema>;
 
 function EsperanzaPage() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isCatequista, isSecretaria } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "activo" | "inactivo">("all");
   const [open, setOpen] = useState(false);
@@ -193,7 +193,7 @@ function EsperanzaPage() {
   const exportData = () =>
     filtered.map((m) => ({
       Nombre: m.full_name,
-      DNI: m.dni ?? "",
+      CI: m.dni ?? "",
       Teléfono: m.telefono ?? "",
       "Fecha nacimiento": m.fecha_nacimiento ?? "",
       Email: m.email ?? "",
@@ -214,6 +214,8 @@ function EsperanzaPage() {
         `Total: ${data.length} registros`,
       );
   };
+
+  if ((isCatequista || isSecretaria) && !isAdmin) return <Navigate to="/app" />;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -254,10 +256,10 @@ function EsperanzaPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={openNew} className="max-md:w-full">
+          {!isSecretaria && (<Button onClick={openNew} className="max-md:w-full">
             <Plus className="mr-2 h-4 w-4" />
             Nuevo miembro
-          </Button>
+          </Button>)}
         </div>
       </div>
 
@@ -273,7 +275,7 @@ function EsperanzaPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Buscar por nombre o DNI"
+                placeholder="Buscar por nombre o CI"
                 className="w-full sm:w-64 pl-8"
               />
             </div>
@@ -302,7 +304,7 @@ function EsperanzaPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nombre</TableHead>
-                  <TableHead>DNI</TableHead>
+                  <TableHead>CI</TableHead>
                   <TableHead>Teléfono</TableHead>
                   <TableHead>Fecha de nacimiento</TableHead>
                   <TableHead>Email</TableHead>
@@ -323,10 +325,10 @@ function EsperanzaPage() {
                       <div className="flex flex-col items-center gap-2">
                         <Inbox className="h-8 w-8 opacity-40" />
                         <p>No hay miembros en Esperanza.</p>
-                        <Button size="sm" variant="outline" onClick={openNew}>
+                        {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}>
                           <Plus className="mr-2 h-4 w-4" />
                           Nuevo miembro
-                        </Button>
+                        </Button>)}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -344,14 +346,14 @@ function EsperanzaPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
+                        {!isSecretaria && (<Button
                           size="icon"
                           variant="ghost"
                           aria-label={`Editar miembro ${m.full_name}`}
                           onClick={() => openEdit(m)}
                         >
                           <Pencil className="h-4 w-4" />
-                        </Button>
+                        </Button>)}
                         {isAdmin && (
                           <DeleteDialog
                             title={`¿Eliminar a ${m.full_name}?`}
@@ -408,14 +410,14 @@ function EsperanzaPage() {
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{m.full_name}</span>
                       <div className="flex gap-1">
-                        <Button
+                        {!isSecretaria && (<Button
                           size="icon"
                           variant="ghost"
                           aria-label={`Editar miembro ${m.full_name}`}
                           onClick={() => openEdit(m)}
                         >
                           <Pencil className="h-4 w-4" />
-                        </Button>
+                        </Button>)}
                         {isAdmin && (
                           <DeleteDialog
                             title={`¿Eliminar a ${m.full_name}?`}
@@ -437,7 +439,7 @@ function EsperanzaPage() {
                       </div>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm">
-                      <span className="text-muted-foreground">DNI</span>
+                      <span className="text-muted-foreground">CI</span>
                       <span>{m.dni ?? "—"}</span>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm">
@@ -497,7 +499,7 @@ function EsperanzaPage() {
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="dni">DNI</Label>
+            <Label htmlFor="dni">CI</Label>
             <Input id="dni" {...form.register("dni")} aria-invalid={!!form.formState.errors.dni} />
             <FieldError name="dni" form={form} />
           </div>

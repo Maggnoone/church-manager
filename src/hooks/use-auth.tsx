@@ -11,7 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { logSafeError } from "@/lib/safe-error";
 
-export type AppRole = "admin" | "catequista" | "tesorero";
+export type AppRole = "admin" | "catequista" | "tesorero" | "secretaria";
 
 interface AuthContextValue {
   session: Session | null;
@@ -21,6 +21,7 @@ interface AuthContextValue {
   isAdmin: boolean;
   isTesorero: boolean;
   isCatequista: boolean;
+  isSecretaria: boolean;
   canSeePagos: boolean;
   signOut: () => Promise<void>;
   refreshRoles: () => Promise<void>;
@@ -242,6 +243,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = roles.includes("admin");
   const isTesorero = roles.includes("tesorero");
   const isCatequista = roles.includes("catequista");
+  const isSecretaria = roles.includes("secretaria");
 
   return (
     <AuthContext.Provider
@@ -253,6 +255,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin,
         isTesorero,
         isCatequista,
+        isSecretaria,
         canSeePagos: isAdmin || isTesorero,
         signOut,
         refreshRoles,

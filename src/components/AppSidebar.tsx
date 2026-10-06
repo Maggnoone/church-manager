@@ -33,7 +33,7 @@ import logoESP from "@/assets/logoESP.png";
 export function AppSidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
-  const { user, roles, signOut, canSeePagos, isAdmin } = useAuth();
+  const { user, roles, signOut, canSeePagos, isAdmin, isCatequista, isSecretaria } = useAuth();
   const navigate = useNavigate();
 
   const handleNav = () => {
@@ -50,8 +50,16 @@ export function AppSidebar() {
     { title: "Confirmandos", url: "/app/confirmandos", icon: Users },
     { title: "Padrinos", url: "/app/padrinos", icon: HeartHandshake },
     { title: "Asistencia", url: "/app/asistencia", icon: ClipboardCheck },
-    { title: "Esperanza", url: "/app/esperanza", icon: Heart },
-    { title: "Asistencia Esperanza", url: "/app/asistencia-esperanza", icon: ClipboardCheck },
+    ...(!((isCatequista || isSecretaria) && !isAdmin)
+      ? [
+          { title: "Esperanza", url: "/app/esperanza", icon: Heart },
+          {
+            title: "Asistencia Esperanza",
+            url: "/app/asistencia-esperanza",
+            icon: ClipboardCheck,
+          },
+        ]
+      : []),
   ];
 
   const formacionItems = [

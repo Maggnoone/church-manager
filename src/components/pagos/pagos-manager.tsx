@@ -320,31 +320,33 @@ export function PagosManager({ concepto }: PagosManagerProps) {
           <h1 className="font-display text-3xl font-semibold">{title}</h1>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <div className="flex flex-wrap gap-2 max-sm:w-full">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="max-sm:min-w-0 max-sm:flex-[2]">
-                <Download className="mr-2 h-4 w-4" />
-                Exportar
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleExport("xlsx")}>Excel</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport("pdf")}>PDF</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button
-            variant="outline"
-            className="max-sm:min-w-0 max-sm:flex-[3]"
-            onClick={() => {
-              setCostoMonto(String(activeCosto?.monto ?? ""));
-              setOpenCosto(true);
-            }}
-          >
-            <Wallet className="mr-2 h-4 w-4" />
-            Costo: {formatCurrency(activeCosto?.monto ?? 0)}
-          </Button>
-          <Button onClick={() => setOpenPago(true)} className="max-sm:basis-full">
+        <div className="flex w-full flex-col gap-2 max-sm:w-full sm:ml-auto sm:w-auto sm:min-w-[22rem]">
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex-1 max-sm:flex-1">
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleExport("xlsx")}>Excel</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExport("pdf")}>PDF</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              variant="outline"
+              className="flex-1 max-sm:flex-1"
+              onClick={() => {
+                setCostoMonto(String(activeCosto?.monto ?? ""));
+                setOpenCosto(true);
+              }}
+            >
+              <Wallet className="mr-2 h-4 w-4" />
+              Costo: {formatCurrency(activeCosto?.monto ?? 0)}
+            </Button>
+          </div>
+          <Button onClick={() => setOpenPago(true)} className="w-full max-sm:w-full">
             <Plus className="mr-2 h-4 w-4" />
             Registrar pago
           </Button>

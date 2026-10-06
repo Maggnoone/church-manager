@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/app/asistencia-esperanza")({
 
 function AsistenciaEsperanzaPage() {
   const qc = useQueryClient();
-  const { user } = useAuth();
+  const { user, isAdmin, isCatequista, isSecretaria } = useAuth();
   const [month, setMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [page, setPage] = useState(1);
@@ -195,6 +195,8 @@ function AsistenciaEsperanzaPage() {
   };
 
   const isLoading = loadingMiembros || loadingAsistencia;
+
+  if ((isCatequista || isSecretaria) && !isAdmin) return <Navigate to="/app" />;
 
   return (
     <div className="mx-auto w-full min-w-0 max-w-5xl space-y-6">
@@ -386,6 +388,8 @@ function AsistenciaEsperanzaPage() {
                       </span>
                       <Switch
                         checked={!!a?.presente}
+                        disabled={isSecretaria}
+                        title={isSecretaria ? "Solo lectura" : undefined}
                         onCheckedChange={(v) => toggle.mutate({ miembro_id: m.id, presente: v })}
                       />
                     </div>

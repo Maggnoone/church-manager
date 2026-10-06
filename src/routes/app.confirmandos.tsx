@@ -53,7 +53,7 @@ type FormValues = z.infer<typeof schema>;
 
 function ConfirmandosPage() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSecretaria } = useAuth();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [open, setOpen] = useState(false);
@@ -120,8 +120,15 @@ function ConfirmandosPage() {
     mutationFn: async (values: FormValues) => {
       const payload = buildPayload(values);
       if (editing) {
-        const { error } = await supabase.from("confirmandos").update(payload).eq("id", editing.id);
+        const { data, error } = await supabase
+          .from("confirmandos")
+          .update(payload)
+          .eq("id", editing.id)
+          .select("id");
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("No se pudo guardar: tu usuario no tiene permiso para editar confirmandos.");
+        }
       } else {
         const { error } = await supabase.from("confirmandos").insert(payload);
         if (error) throw error;
@@ -161,7 +168,7 @@ function ConfirmandosPage() {
   const exportData = () =>
     filtered.map((r) => ({
       Nombre: r.full_name,
-      DNI: r.dni ?? "",
+      CI: r.dni ?? "",
       Grupo: r.grupos?.nombre ?? "",
       Padrino: r.padrinos?.full_name ?? "",
       Bautismo: r.has_baptism ? "Sí" : "No",
@@ -204,7 +211,7 @@ function ConfirmandosPage() {
               <DropdownMenuItem onClick={() => handleExport("csv")}><FileType className="mr-2 h-4 w-4" />CSV</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
+          {!isSecretaria && (<Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>)}
         </div>
       </div>
 
@@ -220,7 +227,7 @@ function ConfirmandosPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Buscar por nombre o DNI"
+                placeholder="Buscar por nombre o CI"
                 className="w-full sm:w-64 pl-8"
               />
             </div>
@@ -249,7 +256,7 @@ function ConfirmandosPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nombre</TableHead>
-                  <TableHead>DNI</TableHead>
+                  <TableHead>CI</TableHead>
                   <TableHead>Grupo</TableHead>
                   <TableHead>Padrino</TableHead>
                   <TableHead>Sacramentos</TableHead>
@@ -265,7 +272,7 @@ function ConfirmandosPage() {
                     <div className="flex flex-col items-center gap-2">
                       <Inbox className="h-8 w-8 opacity-40" />
                       <p>No hay confirmandos registrados.</p>
-                      <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo confirmando</Button>
+                      {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo confirmando</Button>)}
                     </div>
                   </TableCell></TableRow>
                 ) : paginated.map((r) => (
@@ -286,7 +293,7 @@ function ConfirmandosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button size="icon" variant="ghost" aria-label={`Editar confirmando ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                      {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar confirmando ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                       {isAdmin && (
                         <DeleteDialog
                           title={`¿Eliminar a ${r.full_name}?`}
@@ -324,7 +331,7 @@ function ConfirmandosPage() {
                 <div className="flex flex-col items-center gap-2">
                   <Inbox className="h-8 w-8 opacity-40" />
                   <p>No hay confirmandos registrados.</p>
-                  <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo confirmando</Button>
+                  {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo confirmando</Button>)}
                 </div>
               </div>
             ) : (
@@ -334,7 +341,7 @@ function ConfirmandosPage() {
                     <div className="flex items-center justify-between gap-2">
                       <span className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug max-[375px]:text-[13px]">{r.full_name}</span>
                       <div className="flex shrink-0 gap-1">
-                        <Button size="icon" variant="ghost" aria-label={`Editar confirmando ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                        {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar confirmando ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                         {isAdmin && (
                           <DeleteDialog
                             title={`¿Eliminar a ${r.full_name}?`}
@@ -351,7 +358,7 @@ function ConfirmandosPage() {
                       </div>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
-                      <span className="shrink-0 text-muted-foreground">DNI</span>
+                      <span className="shrink-0 text-muted-foreground">CI</span>
                       <span className="min-w-0 truncate text-right">{r.dni ?? "—"}</span>
                     </div>
                     <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]">
@@ -403,7 +410,7 @@ function ConfirmandosPage() {
             <FieldError name="full_name" form={form} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="dni">DNI</Label>
+            <Label htmlFor="dni">CI</Label>
             <Input id="dni" {...form.register("dni")} aria-invalid={!!form.formState.errors.dni} />
             <FieldError name="dni" form={form} />
           </div>

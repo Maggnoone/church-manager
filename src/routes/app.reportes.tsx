@@ -1114,7 +1114,7 @@ function ExportarSection() {
       data: () =>
         confirmandos.map((c) => ({
           Nombre: c.full_name,
-          DNI: c.dni,
+          CI: c.dni,
           Grupo: c.grupos?.nombre,
           Padrino: c.padrinos?.full_name,
           Bautismo: c.has_baptism ? "Sí" : "No",
@@ -1130,7 +1130,7 @@ function ExportarSection() {
       data: () =>
         pendientes.map((c) => ({
           Nombre: c.full_name,
-          DNI: c.dni,
+          CI: c.dni,
           Bautismo: c.has_baptism ? "Sí" : "Falta",
           Comunión: c.has_communion ? "Sí" : "Falta",
           Padrino: c.padrinos?.full_name ?? "Sin asignar",
@@ -1144,7 +1144,7 @@ function ExportarSection() {
       data: () =>
         aptos.map((c) => ({
           Nombre: c.full_name,
-          DNI: c.dni,
+          CI: c.dni,
           Estado: c.status,
           Fecha_confirmación: c.fecha_confirmacion ?? "—",
         })),
@@ -1157,7 +1157,7 @@ function ExportarSection() {
       data: () =>
         sinBautismo.map((c) => ({
           Nombre: c.full_name,
-          DNI: c.dni,
+          CI: c.dni,
           Contacto: c.contacto_padres ?? c.telefono,
         })),
       filename: "sin-bautismo",

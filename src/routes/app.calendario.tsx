@@ -21,6 +21,7 @@ import { formatDateTime } from "@/lib/export";
 import { cn } from "@/lib/utils";
 import { useCharlasCalendario } from "@/hooks/use-data";
 import type { Charla } from "@/integrations/supabase/types";
+import { useAuth } from "@/hooks/use-auth";
 import { toDateKey, getMonthGridDays, WEEKDAYS } from "@/lib/calendar-grid";
 
 export const Route = createFileRoute("/app/calendario")({ component: CalendarioPage });
@@ -128,6 +129,7 @@ function SessionItem({ charla }: { charla: Charla }) {
 }
 
 function CalendarioPage() {
+  const { isSecretaria } = useAuth();
   const { data: charlas = [], isLoading } = useCharlasCalendario();
   const [view, setView] = useState<"lista" | "calendario">("lista");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -196,12 +198,12 @@ function CalendarioPage() {
               Calendario
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button asChild className="max-sm:w-full">
+          {!isSecretaria && (<Button asChild className="max-sm:w-full">
             <Link to="/app/charlas">
               <Plus className="mr-2 h-4 w-4" />
               Nueva sesión
             </Link>
-          </Button>
+          </Button>)}
         </div>
       </div>
 

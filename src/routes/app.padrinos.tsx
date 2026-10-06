@@ -40,7 +40,7 @@ type FormValues = z.infer<typeof schema>;
 
 function PadrinosPage() {
   const qc = useQueryClient();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isSecretaria } = useAuth();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Padrino | null>(null);
 
@@ -96,10 +96,10 @@ function PadrinosPage() {
           <p className="text-sm text-muted-foreground">Registro completo de padrinos disponibles.</p>
         </div>
         <div className="flex flex-wrap gap-2 max-sm:w-full">
-          <Button variant="outline" className="max-sm:flex-1" onClick={() => exportToXLSX(rows.map((r) => ({ Nombre: r.full_name, DNI: r.dni, Teléfono: r.telefono, Email: r.email, Parentesco: r.parentesco, Confirmado: r.has_confirmation ? "Sí" : "No" })), "padrinos")}>
+          <Button variant="outline" className="max-sm:flex-1" onClick={() => exportToXLSX(rows.map((r) => ({ Nombre: r.full_name, CI: r.dni, Teléfono: r.telefono, Email: r.email, Parentesco: r.parentesco, Confirmado: r.has_confirmation ? "Sí" : "No" })), "padrinos")}>
             <Download className="mr-2 h-4 w-4" />Exportar
           </Button>
-          <Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>
+          {!isSecretaria && (<Button onClick={openNew} className="max-sm:flex-1"><Plus className="mr-2 h-4 w-4" />Nuevo</Button>)}
         </div>
       </div>
 
@@ -109,7 +109,7 @@ function PadrinosPage() {
           {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
             <Table>
-              <TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>DNI</TableHead><TableHead>Teléfono</TableHead><TableHead>Parentesco</TableHead><TableHead>Confirmado</TableHead><TableHead className="text-right">Acciones</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>CI</TableHead><TableHead>Teléfono</TableHead><TableHead>Parentesco</TableHead><TableHead>Confirmado</TableHead><TableHead className="text-right">Acciones</TableHead></TableRow></TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow><TableCell colSpan={6} className="py-0"><TableSkeleton cols={6} rows={5} /></TableCell></TableRow>
@@ -118,7 +118,7 @@ function PadrinosPage() {
                     <div className="flex flex-col items-center gap-2">
                       <Inbox className="h-8 w-8 opacity-40" />
                       <p>No hay padrinos registrados.</p>
-                      <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo padrino</Button>
+                      {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo padrino</Button>)}
                     </div>
                   </TableCell></TableRow>
                 ) : paginated.map((r) => (
@@ -129,7 +129,7 @@ function PadrinosPage() {
                     <TableCell>{r.parentesco ?? "—"}</TableCell>
                     <TableCell>{r.has_confirmation ? "Sí" : "No"}</TableCell>
                     <TableCell className="text-right">
-                      <Button size="icon" variant="ghost" aria-label={`Editar padrino ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                      {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar padrino ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                       {isAdmin && (
                         <DeleteDialog
                           title={`¿Eliminar a ${r.full_name}?`}
@@ -161,7 +161,7 @@ function PadrinosPage() {
                 <div className="flex flex-col items-center gap-2">
                   <Inbox className="h-8 w-8 opacity-40" />
                   <p>No hay padrinos registrados.</p>
-                  <Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo padrino</Button>
+                  {!isSecretaria && (<Button size="sm" variant="outline" onClick={openNew}><Plus className="mr-2 h-4 w-4" />Nuevo padrino</Button>)}
                 </div>
               </div>
             ) : (
@@ -171,7 +171,7 @@ function PadrinosPage() {
                     <div className="flex items-center justify-between gap-2">
                       <span className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug max-[375px]:text-[13px]">{r.full_name}</span>
                       <div className="flex shrink-0 gap-1">
-                        <Button size="icon" variant="ghost" aria-label={`Editar padrino ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
+                        {!isSecretaria && (<Button size="icon" variant="ghost" aria-label={`Editar padrino ${r.full_name}`} onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>)}
                         {isAdmin && (
                           <DeleteDialog
                             title={`¿Eliminar a ${r.full_name}?`}
@@ -187,7 +187,7 @@ function PadrinosPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">DNI</span><span className="min-w-0 truncate text-right">{r.dni ?? "—"}</span></div>
+                    <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">CI</span><span className="min-w-0 truncate text-right">{r.dni ?? "—"}</span></div>
                     <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Teléfono</span><span className="min-w-0 truncate text-right">{r.telefono ?? "—"}</span></div>
                     <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Parentesco</span><span className="min-w-0 truncate text-right">{r.parentesco ?? "—"}</span></div>
                     <div className="flex items-start justify-between gap-2 text-sm max-[375px]:text-[13px]"><span className="shrink-0 text-muted-foreground">Confirmado</span><span>{r.has_confirmation ? "Sí" : "No"}</span></div>
@@ -218,7 +218,7 @@ function PadrinosPage() {
             <FieldError name="full_name" form={form} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="dni">DNI</Label>
+            <Label htmlFor="dni">CI</Label>
             <Input id="dni" {...form.register("dni")} aria-invalid={!!form.formState.errors.dni} />
             <FieldError name="dni" form={form} />
           </div>

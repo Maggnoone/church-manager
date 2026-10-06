@@ -17,12 +17,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useAsistenciaResumen } from "@/hooks/use-data";
 import { ErrorFallback } from "@/components/ErrorFallback";
 import { formatCurrency } from "@/lib/export";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import type { Confirmando, Pago, CostoRetiro } from "@/integrations/supabase/types";
 import {
-  buildAttendanceTrend,
+  buildAttendanceTrendFromResumen,
   buildConfirmandoStatusCounts,
   buildPendingRequirements,
   type AttendanceTrendPoint,
@@ -61,6 +62,7 @@ interface KpiCard {
 function Dashboard() {
   const { user, roles, canSeePagos } = useAuth();
   const reduceMotion = useReducedMotion();
+  const { data: resumen = [], isLoading: loadingResumen } = useAsistenciaResumen();
 
   const {
     data: stats,
@@ -138,7 +140,7 @@ function Dashboard() {
         pendiente: Math.max(costoTotal - cobradoReal, 0),
         pendingRequirements: buildPendingRequirements(dataConf),
         confirmandoStatuses: buildConfirmandoStatusCounts(dataConf),
-        attendanceTrend: buildAttendanceTrend(charlas.data ?? [], attendanceRows),
+        attendanceTrend: buildAttendanceTrendFromResumen(resumen),
       };
     },
   });
@@ -255,7 +257,7 @@ function Dashboard() {
         <ConfirmandoStatusChart data={stats?.confirmandoStatuses ?? []} isLoading={isLoading} />
         <AttendanceTrendChart
           data={stats?.attendanceTrend ?? []}
-          isLoading={isLoading}
+          isLoading={isLoading || loadingResumen}
           className="lg:col-span-2"
         />
       </div>

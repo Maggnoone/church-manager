@@ -17,7 +17,7 @@ import { TableSkeleton } from "@/components/TableSkeleton";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useGrupos, useProfiles, useUserRoles } from "@/hooks/use-data";
-import type { UserRole, AppRole, GrupoInsert } from "@/integrations/supabase/types";
+import type { UserRoleInsert, AppRole, GrupoInsert } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/app/configuracion")({ component: ConfigPage });
 
@@ -61,7 +61,7 @@ function ConfigPage() {
 
   const saveRol = useMutation({
     mutationFn: async () => {
-      const payload: UserRole = { user_id: rolForm.user_id, role: rolForm.role, id: "", created_at: "" };
+      const payload: UserRoleInsert = { user_id: rolForm.user_id, role: rolForm.role };
       const { error } = await supabase.from("user_roles").insert(payload); if (error) throw error;
     },
     onSuccess: () => { toast.success("Rol asignado"); qc.invalidateQueries({ queryKey: ["user-roles"] }); setOpenRol(false); },
@@ -86,7 +86,7 @@ function ConfigPage() {
       <Card className="shadow-soft">
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
           <div><CardTitle className="text-base">Grupos / Promociones</CardTitle><CardDescription>Organiza los confirmandos por grupo de catequesis.</CardDescription></div>
-          <Button size="sm" onClick={() => setOpenGrupo(true)}><Plus className="mr-2 h-4 w-4" />Nuevo grupo</Button>
+          <Button size="sm" onClick={() => setOpenGrupo(true)} className="max-sm:w-full"><Plus className="mr-2 h-4 w-4" />Nuevo grupo</Button>
         </CardHeader>
         <CardContent>
           {/* Desktop table */}
@@ -116,10 +116,16 @@ function ConfigPage() {
             ) : (
               grupos.map((g) => (
                 <Card key={g.id} className="shadow-soft">
-                  <CardContent className="p-4 space-y-2">
-                    <span className="font-semibold">{g.nombre}</span>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Año</span><span>{g.anio}</span></div>
-                    <div className="flex items-start justify-between gap-2 text-sm"><span className="text-muted-foreground">Descripción</span><span className="text-muted-foreground">{g.descripcion ?? "—"}</span></div>
+                  <CardContent className="p-4 space-y-2 max-[375px]:p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1 truncate text-[15px] font-semibold leading-snug max-[375px]:text-[13px]">{g.nombre}</span>
+                      <Badge variant="secondary" className="shrink-0">{g.anio}</Badge>
+                    </div>
+                    {g.descripcion ? (
+                      <p className="break-words text-sm text-muted-foreground line-clamp-3 max-[375px]:text-[13px]">{g.descripcion}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground/70 max-[375px]:text-[13px]">Sin descripción</p>
+                    )}
                     <div className="flex justify-end pt-1"><DeleteDialog title={`¿Eliminar el grupo "${g.nombre}"?`} description="Los confirmandos y las charlas asociados no se eliminarán, pero quedarán sin grupo." trigger={<Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={removeGrupo.isPending}><Trash2 className="mr-2 h-4 w-4" />Eliminar grupo</Button>} onConfirm={() => removeGrupo.mutate(g.id)} isPending={removeGrupo.isPending} /></div>
                   </CardContent>
                 </Card>
@@ -241,6 +247,7 @@ function ConfigPage() {
                 <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="catequista">Catequista</SelectItem>
                 <SelectItem value="tesorero">Tesorero</SelectItem>
+                <SelectItem value="secretaria">Secretaria</SelectItem>
               </SelectContent>
             </Select>
           </div>
