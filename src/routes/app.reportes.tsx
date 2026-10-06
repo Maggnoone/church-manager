@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -237,7 +243,13 @@ function AsistenciaSection() {
         </div>
       </div>
 
-      <AttendanceTrendChart data={attendanceTrend} isLoading={loadingCharlas} className="hidden md:block" />
+      {subTab === "charla" && (
+        <AttendanceTrendChart
+          data={attendanceTrend}
+          isLoading={loadingCharlas}
+          className="hidden md:block"
+        />
+      )}
 
       {/* ── Por charla ── */}
       {subTab === "charla" && (
@@ -432,7 +444,9 @@ function AsistenciaSection() {
                         <span>{c.grupo ?? "—"}</span>
                       </div>
                       <div className="flex items-start justify-between gap-2 text-sm">
-                        <span className="text-muted-foreground">Asistidas / Ausencias / Total charlas</span>
+                        <span className="text-muted-foreground">
+                          Asistidas / Ausencias / Total charlas
+                        </span>
                         <span>
                           {c.asistidas} / {c.ausencias} / {c.total_sesiones}
                         </span>
