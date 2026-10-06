@@ -530,10 +530,11 @@ function PagosSection() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-md:w-full">
           <Button
             size="sm"
             variant={subTab === "retiro" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("retiro");
               setPage(1);
@@ -545,6 +546,7 @@ function PagosSection() {
           <Button
             size="sm"
             variant={subTab === "boleta" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("boleta");
               setPage(1);
@@ -557,6 +559,7 @@ function PagosSection() {
         <Button
           size="sm"
           variant="outline"
+          className="max-md:flex-1"
           onClick={() => runExport("xlsx", `Pagos ${subTab}`, exportRows(), `pagos-${subTab}`)}
         >
           <FileSpreadsheet className="mr-2 h-4 w-4" />
@@ -779,10 +782,11 @@ function RequisitosSection() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-md:w-full">
           <Button
             size="sm"
             variant={subTab === "confirmando" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("confirmando");
               setPage(1);
@@ -794,6 +798,7 @@ function RequisitosSection() {
           <Button
             size="sm"
             variant={subTab === "padrino" ? "default" : "outline"}
+            className="max-md:flex-1"
             onClick={() => {
               setSubTab("padrino");
               setPage(1);
