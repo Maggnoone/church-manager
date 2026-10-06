@@ -65,13 +65,13 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
-  const { canSeePagos, isAdmin } = useAuth();
+  const { canAccessPagosRetiro, isAdmin } = useAuth();
   const { toggle } = useTheme();
   const confirmandosQuery = useConfirmandosSimple({ enabled: open });
   const padrinosQuery = usePadrinosSimple({ enabled: open });
 
   const visibleNavItems = NAV_ITEMS.filter((item) => {
-    if (item.requires === "pagos") return canSeePagos;
+    if (item.requires === "pagos") return canAccessPagosRetiro;
     if (item.requires === "admin") return isAdmin;
     return true;
   });
@@ -134,7 +134,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         ) : null}
 
         <CommandGroup heading="Acciones">
-          {canSeePagos ? (
+          {canAccessPagosRetiro ? (
             <CommandItem value="Registrar pago" onSelect={() => goTo("/app/pagos-retiro")}>
               <Wallet />
               <span>Registrar pago</span>

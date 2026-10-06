@@ -1,5 +1,5 @@
 import { motion, MotionConfig } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Flame } from "lucide-react";
 import { BrandCardMarquee } from "./brand-card-marquee";
 
 /**
@@ -46,10 +46,10 @@ export function AuthBrandPanel() {
         {/* Content */}
         <div className="relative z-10 flex h-full flex-col justify-end p-10">
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-white/85 backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            <Flame className="h-3.5 w-3.5" aria-hidden="true" />
             Movimiento Esperanza de San Pablo
           </span>
-          <h2 className="mt-6 max-w-[540px] font-serif text-[44px] italic leading-[1.05] text-white xl:text-[56px]">
+          <h2 className="mt-6 max-w-[540px] font-display text-4xl font-semibold leading-[1.05] tracking-tight text-white xl:text-5xl">
             Una Confirmación de Fe
           </h2>
           <p className="mt-5 max-w-md text-base leading-relaxed text-white/70">

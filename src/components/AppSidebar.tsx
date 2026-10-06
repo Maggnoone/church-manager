@@ -33,7 +33,7 @@ import logoESP from "@/assets/logoESP.png";
 export function AppSidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
-  const { user, roles, signOut, canSeePagos, isAdmin, isCatequista, isSecretaria } = useAuth();
+  const { user, roles, signOut, canSeePagos, canAccessPagosRetiro, isAdmin, isCatequista, isSecretaria } = useAuth();
   const navigate = useNavigate();
 
   const handleNav = () => {
@@ -68,11 +68,11 @@ export function AppSidebar() {
   ];
 
   const adminItems = [
+    ...(canAccessPagosRetiro
+      ? [{ title: "Pagos del Retiro", url: "/app/pagos-retiro", icon: Wallet }]
+      : []),
     ...(canSeePagos
-      ? [
-          { title: "Pagos del Retiro", url: "/app/pagos-retiro", icon: Wallet },
-          { title: "Pagos de la Boleta", url: "/app/pagos-boleta", icon: Receipt },
-        ]
+      ? [{ title: "Pagos de la Boleta", url: "/app/pagos-boleta", icon: Receipt }]
       : []),
     { title: "Reportes", url: "/app/reportes", icon: FileBarChart },
     ...(isAdmin ? [{ title: "Configuración", url: "/app/configuracion", icon: Settings }] : []),

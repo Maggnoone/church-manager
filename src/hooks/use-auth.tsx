@@ -23,6 +23,8 @@ interface AuthContextValue {
   isCatequista: boolean;
   isSecretaria: boolean;
   canSeePagos: boolean;
+  canRegisterPagos: boolean;
+  canAccessPagosRetiro: boolean;
   signOut: () => Promise<void>;
   refreshRoles: () => Promise<void>;
 }
@@ -257,6 +259,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isCatequista,
         isSecretaria,
         canSeePagos: isAdmin || isTesorero,
+        canRegisterPagos: isAdmin || isTesorero || isSecretaria,
+        canAccessPagosRetiro: isAdmin || isTesorero || isSecretaria || isCatequista,
         signOut,
         refreshRoles,
       }}

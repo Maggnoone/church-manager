@@ -75,7 +75,7 @@ export function PagosManager({ concepto }: PagosManagerProps) {
     : "Configurar costo de la boleta";
   const pdfTitle = isRetiro ? "Estado de Pagos del Retiro" : "Estado de Pagos de la Boleta";
 
-  const { canSeePagos } = useAuth();
+  const { canSeePagos, canAccessPagosRetiro } = useAuth();
   const qc = useQueryClient();
   const [openCosto, setOpenCosto] = useState(false);
   const [openPago, setOpenPago] = useState(false);
@@ -288,7 +288,8 @@ export function PagosManager({ concepto }: PagosManagerProps) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (!canSeePagos) return <Navigate to="/app" />;
+  const canAccessPage = isRetiro ? canAccessPagosRetiro : canSeePagos;
+  if (!canAccessPage) return <Navigate to="/app" />;
 
   const handleExport = (kind: "xlsx" | "pdf") => {
     const data = balances.map((b) => ({
@@ -334,6 +335,7 @@ export function PagosManager({ concepto }: PagosManagerProps) {
                 <DropdownMenuItem onClick={() => handleExport("pdf")}>PDF</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            {canSeePagos && (
             <Button
               variant="outline"
               className="flex-1 max-sm:flex-1"
@@ -345,6 +347,7 @@ export function PagosManager({ concepto }: PagosManagerProps) {
               <Wallet className="mr-2 h-4 w-4" />
               Costo: {formatCurrency(activeCosto?.monto ?? 0)}
             </Button>
+            )}
           </div>
           <Button onClick={() => setOpenPago(true)} className="w-full max-sm:w-full">
             <Plus className="mr-2 h-4 w-4" />
@@ -364,7 +367,7 @@ export function PagosManager({ concepto }: PagosManagerProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="confirmandos">Confirmandos</SelectItem>
-            {isRetiro && <SelectItem value="esperanza">Esperanza</SelectItem>}
+            {isRetiro && canSeePagos && <SelectItem value="esperanza">Esperanza</SelectItem>}
           </SelectContent>
         </Select>
       </div>

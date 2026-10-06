@@ -115,7 +115,7 @@ function AuthPage() {
                         {...loginForm.register("email")}
                       />
                       {loginForm.formState.errors.email && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs font-medium text-destructive">
                           {loginForm.formState.errors.email.message}
                         </p>
                       )}
@@ -129,7 +129,7 @@ function AuthPage() {
                         {...loginForm.register("password")}
                       />
                       {loginForm.formState.errors.password && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs font-medium text-destructive">
                           {loginForm.formState.errors.password.message}
                         </p>
                       )}
@@ -146,7 +146,7 @@ function AuthPage() {
                       <Label htmlFor="signup-name">Nombre completo</Label>
                       <Input id="signup-name" {...signupForm.register("fullName")} />
                       {signupForm.formState.errors.fullName && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs font-medium text-destructive">
                           {signupForm.formState.errors.fullName.message}
                         </p>
                       )}
@@ -160,7 +160,7 @@ function AuthPage() {
                         {...signupForm.register("email")}
                       />
                       {signupForm.formState.errors.email && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs font-medium text-destructive">
                           {signupForm.formState.errors.email.message}
                         </p>
                       )}
@@ -174,7 +174,7 @@ function AuthPage() {
                         {...signupForm.register("password")}
                       />
                       {signupForm.formState.errors.password && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-xs font-medium text-destructive">
                           {signupForm.formState.errors.password.message}
                         </p>
                       )}

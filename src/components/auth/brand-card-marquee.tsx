@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import {
-  BookOpen,
-  ClipboardCheck,
-  HeartHandshake,
-  Sparkles,
-  Users,
-  Wallet,
+  BookUser,
+  Church,
+  Handshake,
+  ListChecks,
+  PiggyBank,
+  Presentation,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,12 +17,12 @@ interface BrandCard {
 
 /** Hardcoded, decorative domain previews — no data fetching on the auth screen. */
 const CARDS: BrandCard[] = [
-  { icon: Users, label: "Confirmandos", value: "128 en formación" },
-  { icon: HeartHandshake, label: "Padrinos", value: "96 acompañando" },
-  { icon: BookOpen, label: "Charlas", value: "12 programadas" },
-  { icon: ClipboardCheck, label: "Asistencia", value: "92% del grupo" },
-  { icon: Wallet, label: "Recaudado retiro", value: "$48.500" },
-  { icon: Sparkles, label: "Confirmación 2026", value: "40 días" },
+  { icon: BookUser, label: "Confirmandos", value: "128 en formación" },
+  { icon: Handshake, label: "Padrinos", value: "96 acompañando" },
+  { icon: Presentation, label: "Charlas", value: "12 programadas" },
+  { icon: ListChecks, label: "Asistencia", value: "92% del grupo" },
+  { icon: PiggyBank, label: "Recaudado retiro", value: "$48.500" },
+  { icon: Church, label: "Confirmación 2026", value: "40 días" },
 ];
 
 function rotateCards(cards: BrandCard[], offset: number): BrandCard[] {
