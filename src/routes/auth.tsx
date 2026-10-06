@@ -85,7 +85,7 @@ function AuthPage() {
               className="h-10 w-10 rounded-lg object-contain"
             />
             <div className="leading-tight">
-              <p className="font-display text-xl font-semibold">Esperanza de San Pablo</p>
+              <p className="font-display text-xl font-semibold max-[400px]:text-lg">Esperanza de San Pablo</p>
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
                 Una Confirmación de Fe
               </p>
@@ -93,15 +93,15 @@ function AuthPage() {
           </Link>
 
           <Card className="shadow-elegant motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:duration-300">
-            <CardHeader>
-              <CardTitle className="font-display text-2xl">Acceso al sistema</CardTitle>
+            <CardHeader className="max-[400px]:p-4 max-[400px]:pb-3">
+              <CardTitle className="font-display text-2xl max-[400px]:text-xl">Acceso al sistema</CardTitle>
               <CardDescription>Ingresa con tu cuenta de catequista o regístrate.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="max-[400px]:p-4 max-[400px]:pt-0">
               <Tabs defaultValue="login">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Iniciar sesión</TabsTrigger>
-                  <TabsTrigger value="signup">Crear cuenta</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 max-[400px]:p-1">
+                  <TabsTrigger value="login" className="max-[400px]:px-1 max-[400px]:text-[13px]">Iniciar sesión</TabsTrigger>
+                  <TabsTrigger value="signup" className="max-[400px]:px-1 max-[400px]:text-[13px]">Crear cuenta</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="login" className="mt-6">
