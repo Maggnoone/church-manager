@@ -9,26 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppReportesRouteImport } from './routes/app.reportes'
-import { Route as AppPagosRetiroRouteImport } from './routes/app.pagos-retiro'
-import { Route as AppPagosBoletaRouteImport } from './routes/app.pagos-boleta'
-import { Route as AppPagosRouteImport } from './routes/app.pagos'
-import { Route as AppPadrinosRouteImport } from './routes/app.padrinos'
-import { Route as AppEsperanzaRouteImport } from './routes/app.esperanza'
-import { Route as AppConfirmandosRouteImport } from './routes/app.confirmandos'
-import { Route as AppConfiguracionRouteImport } from './routes/app.configuracion'
-import { Route as AppCharlasRouteImport } from './routes/app.charlas'
-import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
-import { Route as AppAsistenciaEsperanzaRouteImport } from './routes/app.asistencia-esperanza'
 import { Route as AppAsistenciaRouteImport } from './routes/app.asistencia'
+import { Route as AppAsistenciaEsperanzaRouteImport } from './routes/app.asistencia-esperanza'
+import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
+import { Route as AppCharlasRouteImport } from './routes/app.charlas'
+import { Route as AppConfiguracionRouteImport } from './routes/app.configuracion'
+import { Route as AppConfirmandosRouteImport } from './routes/app.confirmandos'
+import { Route as AppEsperanzaRouteImport } from './routes/app.esperanza'
+import { Route as AppPadrinosRouteImport } from './routes/app.padrinos'
+import { Route as AppPagosRouteImport } from './routes/app.pagos'
+import { Route as AppPagosBoletaRouteImport } from './routes/app.pagos-boleta'
+import { Route as AppPagosRetiroRouteImport } from './routes/app.pagos-retiro'
+import { Route as AppReportesRouteImport } from './routes/app.reportes'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -36,9 +36,9 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -46,54 +46,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppReportesRoute = AppReportesRouteImport.update({
-  id: '/reportes',
-  path: '/reportes',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPagosRetiroRoute = AppPagosRetiroRouteImport.update({
-  id: '/pagos-retiro',
-  path: '/pagos-retiro',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPagosBoletaRoute = AppPagosBoletaRouteImport.update({
-  id: '/pagos-boleta',
-  path: '/pagos-boleta',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPagosRoute = AppPagosRouteImport.update({
-  id: '/pagos',
-  path: '/pagos',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPadrinosRoute = AppPadrinosRouteImport.update({
-  id: '/padrinos',
-  path: '/padrinos',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppEsperanzaRoute = AppEsperanzaRouteImport.update({
-  id: '/esperanza',
-  path: '/esperanza',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppConfirmandosRoute = AppConfirmandosRouteImport.update({
-  id: '/confirmandos',
-  path: '/confirmandos',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppConfiguracionRoute = AppConfiguracionRouteImport.update({
-  id: '/configuracion',
-  path: '/configuracion',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCharlasRoute = AppCharlasRouteImport.update({
-  id: '/charlas',
-  path: '/charlas',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCalendarioRoute = AppCalendarioRouteImport.update({
-  id: '/calendario',
-  path: '/calendario',
+const AppAsistenciaRoute = AppAsistenciaRouteImport.update({
+  id: '/asistencia',
+  path: '/asistencia',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAsistenciaEsperanzaRoute = AppAsistenciaEsperanzaRouteImport.update({
@@ -101,9 +56,54 @@ const AppAsistenciaEsperanzaRoute = AppAsistenciaEsperanzaRouteImport.update({
   path: '/asistencia-esperanza',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAsistenciaRoute = AppAsistenciaRouteImport.update({
-  id: '/asistencia',
-  path: '/asistencia',
+const AppCalendarioRoute = AppCalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCharlasRoute = AppCharlasRouteImport.update({
+  id: '/charlas',
+  path: '/charlas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfiguracionRoute = AppConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfirmandosRoute = AppConfirmandosRouteImport.update({
+  id: '/confirmandos',
+  path: '/confirmandos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEsperanzaRoute = AppEsperanzaRouteImport.update({
+  id: '/esperanza',
+  path: '/esperanza',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPadrinosRoute = AppPadrinosRouteImport.update({
+  id: '/padrinos',
+  path: '/padrinos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPagosRoute = AppPagosRouteImport.update({
+  id: '/pagos',
+  path: '/pagos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPagosBoletaRoute = AppPagosBoletaRouteImport.update({
+  id: '/pagos-boleta',
+  path: '/pagos-boleta',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPagosRetiroRoute = AppPagosRetiroRouteImport.update({
+  id: '/pagos-retiro',
+  path: '/pagos-retiro',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportesRoute = AppReportesRouteImport.update({
+  id: '/reportes',
+  path: '/reportes',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -225,11 +225,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -239,11 +239,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -253,74 +253,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/reportes': {
-      id: '/app/reportes'
-      path: '/reportes'
-      fullPath: '/app/reportes'
-      preLoaderRoute: typeof AppReportesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/pagos-retiro': {
-      id: '/app/pagos-retiro'
-      path: '/pagos-retiro'
-      fullPath: '/app/pagos-retiro'
-      preLoaderRoute: typeof AppPagosRetiroRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/pagos-boleta': {
-      id: '/app/pagos-boleta'
-      path: '/pagos-boleta'
-      fullPath: '/app/pagos-boleta'
-      preLoaderRoute: typeof AppPagosBoletaRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/pagos': {
-      id: '/app/pagos'
-      path: '/pagos'
-      fullPath: '/app/pagos'
-      preLoaderRoute: typeof AppPagosRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/padrinos': {
-      id: '/app/padrinos'
-      path: '/padrinos'
-      fullPath: '/app/padrinos'
-      preLoaderRoute: typeof AppPadrinosRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/esperanza': {
-      id: '/app/esperanza'
-      path: '/esperanza'
-      fullPath: '/app/esperanza'
-      preLoaderRoute: typeof AppEsperanzaRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/confirmandos': {
-      id: '/app/confirmandos'
-      path: '/confirmandos'
-      fullPath: '/app/confirmandos'
-      preLoaderRoute: typeof AppConfirmandosRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/configuracion': {
-      id: '/app/configuracion'
-      path: '/configuracion'
-      fullPath: '/app/configuracion'
-      preLoaderRoute: typeof AppConfiguracionRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/charlas': {
-      id: '/app/charlas'
-      path: '/charlas'
-      fullPath: '/app/charlas'
-      preLoaderRoute: typeof AppCharlasRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/calendario': {
-      id: '/app/calendario'
-      path: '/calendario'
-      fullPath: '/app/calendario'
-      preLoaderRoute: typeof AppCalendarioRouteImport
+    '/app/asistencia': {
+      id: '/app/asistencia'
+      path: '/asistencia'
+      fullPath: '/app/asistencia'
+      preLoaderRoute: typeof AppAsistenciaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/asistencia-esperanza': {
@@ -330,11 +267,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAsistenciaEsperanzaRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/asistencia': {
-      id: '/app/asistencia'
-      path: '/asistencia'
-      fullPath: '/app/asistencia'
-      preLoaderRoute: typeof AppAsistenciaRouteImport
+    '/app/calendario': {
+      id: '/app/calendario'
+      path: '/calendario'
+      fullPath: '/app/calendario'
+      preLoaderRoute: typeof AppCalendarioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/charlas': {
+      id: '/app/charlas'
+      path: '/charlas'
+      fullPath: '/app/charlas'
+      preLoaderRoute: typeof AppCharlasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/configuracion': {
+      id: '/app/configuracion'
+      path: '/configuracion'
+      fullPath: '/app/configuracion'
+      preLoaderRoute: typeof AppConfiguracionRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/confirmandos': {
+      id: '/app/confirmandos'
+      path: '/confirmandos'
+      fullPath: '/app/confirmandos'
+      preLoaderRoute: typeof AppConfirmandosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/esperanza': {
+      id: '/app/esperanza'
+      path: '/esperanza'
+      fullPath: '/app/esperanza'
+      preLoaderRoute: typeof AppEsperanzaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/padrinos': {
+      id: '/app/padrinos'
+      path: '/padrinos'
+      fullPath: '/app/padrinos'
+      preLoaderRoute: typeof AppPadrinosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pagos': {
+      id: '/app/pagos'
+      path: '/pagos'
+      fullPath: '/app/pagos'
+      preLoaderRoute: typeof AppPagosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pagos-boleta': {
+      id: '/app/pagos-boleta'
+      path: '/pagos-boleta'
+      fullPath: '/app/pagos-boleta'
+      preLoaderRoute: typeof AppPagosBoletaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pagos-retiro': {
+      id: '/app/pagos-retiro'
+      path: '/pagos-retiro'
+      fullPath: '/app/pagos-retiro'
+      preLoaderRoute: typeof AppPagosRetiroRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reportes': {
+      id: '/app/reportes'
+      path: '/reportes'
+      fullPath: '/app/reportes'
+      preLoaderRoute: typeof AppReportesRouteImport
       parentRoute: typeof AppRoute
     }
   }
