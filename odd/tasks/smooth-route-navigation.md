@@ -45,7 +45,7 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Verification:** Focused route test via `npm test -- <focused test path>` (record exact result); `npm test` (record exact result). Runtime harness: `N/A` if behavior is fully covered by the route test and no separate runtime boundary exists; otherwise record the exact scenario/result.
 - **Rollback boundary:** Remove only this unit's route transition change and its focused test.
 - **Selected route/files:** Removed the keyed Framer Motion wrapper and pathname subscription in `src/routes/app.tsx`; expanded `src/routes/app.test.tsx` to assert the Outlet subtree remains mounted while its child changes immediately and the prior route is absent. No route retention; animation removed for all motion preferences (reduced-motion users remain unanimated).
-- **Evidence:** RED: focused test failed on the existing keyed wrapper (`outletMounts` increased 1→2). GREEN: `npm test -- src/routes/app.test.tsx` — 1 file passed, 1 test passed. Full suite: `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. Runtime harness: N/A; the focused route test directly exercises subtree mount lifecycle and immediate child replacement. Auth behavior unchanged. Commit: `fix(navigation): prevent repeated route transition remounts` (hash recorded in Progress after commit).
+- **Evidence:** RED: focused test failed on the existing keyed wrapper (`outletMounts` increased 1→2). GREEN: `npm test -- src/routes/app.test.tsx` — 1 file passed, 1 test passed. Full suite: `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. Runtime harness: N/A; the focused route test directly exercises subtree mount lifecycle and immediate child replacement. Auth behavior unchanged. Commit: `4a34144` (`fix(navigation): prevent repeated route transition remounts`).
 
 ### T2 — Stabilize attendance summary inputs and reads
 
@@ -84,7 +84,7 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Initial worktree evidence:** Existing unrelated untracked `.opencode/` and `AGENTS.md`; preserve both. No other changes were reported by the initial status check.
 - **Inspection evidence supplied by user:** shared QueryClient staleTime is 30 seconds and has no query-level key factories; App route uses a pathname-keyed motion wrapper; report summaries key on the full attendance array and re-fetch metadata; dashboard stats snapshot summary-derived trend.
 - **Current task:** T1 — Stop repeated route transition remounts. Implementation is authorized and must follow strict TDD; close the task with its required ODD work-unit commit and record evidence above.
-- **T1 actual:** 3 files; 19 additions / 28 deletions (net -9); work-unit commit identity recorded in the T1 evidence above and completed commit hash below.
+- **T1 actual:** 3 files; 113 additions / 28 deletions (net +85), including the newly tracked task ledger; commit `4a34144`.
 - **Next tasks:** T2 — Stabilize attendance summary inputs and reads; T3 — Keep dashboard trend live as summaries resolve; T4 — Add bounded authenticated catalog warmup. Complete each as a separate behavior-first task/work-unit commit, preserving the scope, acceptance criteria, and rollback boundary defined above.
 
 ## Delivery strategy and task closeout
