@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Outlet, Navigate, useRouterState } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
+import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppTopbar } from "@/components/app-topbar";
 import { CommandPalette } from "@/components/command-palette";
 import { useAuth } from "@/hooks/use-auth";
-import { pageVariants } from "@/lib/motion";
 import { ErrorFallback } from "@/components/ErrorFallback";
 
 export const Route = createFileRoute("/app")({
@@ -29,8 +27,6 @@ function AppError({ error, reset }: { error: unknown; reset: () => void }) {
 function AppLayout() {
   const { user } = useAuth();
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -70,19 +66,9 @@ function AppLayout() {
             }
           />
           <main id="main-content" className="flex-1 p-6 min-w-0">
-            {reduceMotion ? (
+            <div className="min-w-0">
               <Outlet />
-            ) : (
-              <motion.div
-                key={pathname}
-                variants={pageVariants}
-                initial="initial"
-                animate="animate"
-                className="min-w-0"
-              >
-                <Outlet />
-              </motion.div>
-            )}
+            </div>
           </main>
         </div>
       </div>
