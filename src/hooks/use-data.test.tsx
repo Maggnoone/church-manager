@@ -129,11 +129,13 @@ describe("useAsistenciaHistorial", () => {
     const { result } = renderHook(() => useAsistenciaHistorial("conf-1"), { wrapper });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.map(({ charla_id, presente, charlas: charla }) => ({
-      charla_id,
-      presente,
-      titulo: charla?.titulo,
-    }))).toEqual([
+    expect(
+      result.current.data?.map(({ charla_id, presente, charlas: charla }) => ({
+        charla_id,
+        presente,
+        titulo: charla?.titulo,
+      })),
+    ).toEqual([
       { charla_id: "c1", presente: true, titulo: "Charla 1" },
       { charla_id: "c2", presente: false, titulo: "Charla 2" },
     ]);
@@ -147,19 +149,38 @@ describe("attendance report summaries", () => {
       { id: "conf-2", full_name: "Ana López", group_id: "g2", grupos: { nombre: "Grupo B" } },
     ];
     mockResponses.charlas = [
-      { id: "c1", titulo: "Charla 1", fecha: "2026-01-15", tipo: "teorica", group_id: "g1", grupos: { nombre: "Grupo A" } },
-      { id: "c2", titulo: "Charla 2", fecha: "2026-01-22", tipo: "teorica", group_id: "g2", grupos: { nombre: "Grupo B" } },
+      {
+        id: "c1",
+        titulo: "Charla 1",
+        fecha: "2026-01-15",
+        tipo: "teorica",
+        group_id: "g1",
+        grupos: { nombre: "Grupo A" },
+      },
+      {
+        id: "c2",
+        titulo: "Charla 2",
+        fecha: "2026-01-22",
+        tipo: "teorica",
+        group_id: "g2",
+        grupos: { nombre: "Grupo B" },
+      },
     ];
     mockResponses.asistencia = [
       { id: "direct-c1", charla_id: "c1", confirmando_id: "conf-1", presente: false },
       { id: "direct-c2", charla_id: "c2", confirmando_id: "conf-2", presente: true },
     ];
 
-    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000 } } });
-    queryClient.setQueryData(["asistencias"], [
-      { id: "cached-c1", charla_id: "c1", confirmando_id: "conf-1", presente: true },
-      { id: "cached-c2", charla_id: "c2", confirmando_id: "conf-2", presente: false },
-    ]);
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: 30_000 } },
+    });
+    queryClient.setQueryData(
+      ["asistencias"],
+      [
+        { id: "cached-c1", charla_id: "c1", confirmando_id: "conf-1", presente: true },
+        { id: "cached-c2", charla_id: "c2", confirmando_id: "conf-2", presente: false },
+      ],
+    );
     const options = { wrapper: createWrapper(queryClient) };
     const { result: resumen } = renderHook(() => useAsistenciaResumen(), options);
     const { result: porConfirmando } = renderHook(() => useAsistenciaPorConfirmando(), options);
@@ -169,23 +190,36 @@ describe("attendance report summaries", () => {
       expect(porConfirmando.current.isSuccess).toBe(true);
     });
 
-    expect.soft(
-      resumen.current.data
-        ?.map(({ charla_id, presentes, ausentes }) => ({ charla_id, presentes, ausentes }))
-        .sort((a, b) => a.charla_id.localeCompare(b.charla_id)),
-    ).toEqual([
-      { charla_id: "c1", presentes: 1, ausentes: 0 },
-      { charla_id: "c2", presentes: 0, ausentes: 1 },
-    ]);
-    expect.soft(porConfirmando.current.data?.map(({ confirmando_id, total_sesiones, asistidas, ausencias }) => ({
-      confirmando_id,
-      total_sesiones,
-      asistidas,
-      ausencias,
-    }))).toEqual([
-      { confirmando_id: "conf-1", total_sesiones: 2, asistidas: 1, ausencias: 1 },
-      { confirmando_id: "conf-2", total_sesiones: 2, asistidas: 0, ausencias: 2 },
-    ]);
+    expect
+      .soft(
+        resumen.current.data
+          ?.map(({ charla_id, presentes, ausentes }) => ({ charla_id, presentes, ausentes }))
+          .sort((a, b) => a.charla_id.localeCompare(b.charla_id)),
+      )
+      .toEqual([
+        { charla_id: "c1", presentes: 1, ausentes: 0 },
+        { charla_id: "c2", presentes: 0, ausentes: 1 },
+      ]);
+    expect
+      .soft(
+        porConfirmando.current.data?.map(
+          ({ confirmando_id, total_sesiones, asistidas, ausencias }) => ({
+            confirmando_id,
+            total_sesiones,
+            asistidas,
+            ausencias,
+          }),
+        ),
+      )
+      .toEqual([
+        { confirmando_id: "conf-1", total_sesiones: 2, asistidas: 1, ausencias: 1 },
+        { confirmando_id: "conf-2", total_sesiones: 2, asistidas: 0, ausencias: 2 },
+      ]);
+    const { supabase } = await import("@/integrations/supabase/client");
+    expect(supabase.from).not.toHaveBeenCalledWith("asistencia");
+    const fromMock = supabase.from as unknown as ReturnType<typeof vi.fn>;
+    expect(fromMock.mock.calls.filter(([table]) => table === "charlas")).toHaveLength(1);
+    expect(fromMock.mock.calls.filter(([table]) => table === "confirmandos")).toHaveLength(1);
   });
 });
 

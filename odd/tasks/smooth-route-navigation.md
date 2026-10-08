@@ -45,7 +45,7 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Verification:** Focused route test via `npm test -- <focused test path>` (record exact result); `npm test` (record exact result). Runtime harness: `N/A` if behavior is fully covered by the route test and no separate runtime boundary exists; otherwise record the exact scenario/result.
 - **Rollback boundary:** Remove only this unit's route transition change and its focused test.
 - **Selected route/files:** Removed the keyed Framer Motion wrapper and pathname subscription in `src/routes/app.tsx`; expanded `src/routes/app.test.tsx` to assert the Outlet subtree remains mounted while its child changes immediately and the prior route is absent. No route retention; animation removed for all motion preferences (reduced-motion users remain unanimated).
-- **Evidence:** RED: focused test failed on the existing keyed wrapper (`outletMounts` increased 1→2). GREEN: `npm test -- src/routes/app.test.tsx` — 1 file passed, 1 test passed. Full suite: `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. Runtime harness: N/A; the focused route test directly exercises subtree mount lifecycle and immediate child replacement. Auth behavior unchanged. Commit: `4a34144` (`fix(navigation): prevent repeated route transition remounts`).
+- **Evidence:** RED: focused test failed on the existing keyed wrapper (`outletMounts` increased 1→2). GREEN: `npm test -- src/routes/app.test.tsx` — 1 file passed, 1 test passed. Full suite: `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. Runtime harness: N/A; the focused route test directly exercises subtree mount lifecycle and immediate child replacement. Auth behavior unchanged. Implementation commit: `b07105f` (`fix(navigation): prevent repeated route transition remounts`); documentation follow-up: `895bbe4` (`docs(odd): record route transition task evidence`).
 
 ### T2 — Stabilize attendance summary inputs and reads
 
@@ -55,7 +55,12 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Acceptance:** Focused tests prove stable summary identity/key behavior, no redundant/sequential source reads for the same data, and unchanged group and duplicate semantics, including existing edge cases.
 - **Verification:** Focused report-summary tests via `npm test -- <focused test path>` (record exact result); `npm test` (record exact result). Runtime harness: `N/A` only if tests fully cover the query/data boundary; otherwise record exact scenario/result.
 - **Rollback boundary:** Revert only this unit's summary/query derivation changes and associated tests.
-- **Evidence:** Pending implementation.
+- **Selected route/files:** `src/hooks/use-data.ts` attendance summary hooks now consume the existing canonical `useAsistencias`, `useCharlas`, and `useConfirmandos` query caches and derive results with `useMemo`; `src/hooks/use-data.test.tsx` asserts shared reads when both summaries mount against seeded attendance. Summary outputs no longer have independent array-keyed queries or metadata fetch chains.
+- **TDD evidence:** RED: `npm test -- src/hooks/use-data.test.tsx` failed in the seeded-cache summary scenario because redundant calls were made (the test first exposed repeated metadata reads; its final assertions require exactly one canonical read for each metadata source and no attendance network read). GREEN: focused command passed, 1 file / 7 tests.
+- **Verification:** `npm test -- src/hooks/use-data.test.tsx` — 1 file passed, 7 tests passed. `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. `npx tsc --noEmit` — only existing unrelated `src/lib/dashboard-chart-data.ts(205,3): error TS6133` remains. Runtime harness: N/A; query-cache boundary and summary result behavior are tested directly.
+- **Forecast / actual:** Forecast 3 files, approximately 50 additions / 40 deletions. Actual pre-commit diff: 3 files, 190 additions / 136 deletions (includes formatting in the focused hook/test regions and tracker evidence); no extra implementation files.
+- **Rollback boundary:** Revert only the summary derivation changes in `src/hooks/use-data.ts` and corresponding regression assertion in `src/hooks/use-data.test.tsx`; retain all unrelated navigation work.
+- **Commit:** Pending.
 
 ### T3 — Keep dashboard trend live as summaries resolve
 
@@ -83,9 +88,10 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Initial branch:** `feat/smooth-route-navigation`.
 - **Initial worktree evidence:** Existing unrelated untracked `.opencode/` and `AGENTS.md`; preserve both. No other changes were reported by the initial status check.
 - **Inspection evidence supplied by user:** shared QueryClient staleTime is 30 seconds and has no query-level key factories; App route uses a pathname-keyed motion wrapper; report summaries key on the full attendance array and re-fetch metadata; dashboard stats snapshot summary-derived trend.
-- **Current task:** T1 — Stop repeated route transition remounts. Implementation is authorized and must follow strict TDD; close the task with its required ODD work-unit commit and record evidence above.
-- **T1 actual:** 3 files; 113 additions / 28 deletions (net +85), including the newly tracked task ledger; commit `4a34144`.
-- **Next tasks:** T2 — Stabilize attendance summary inputs and reads; T3 — Keep dashboard trend live as summaries resolve; T4 — Add bounded authenticated catalog warmup. Complete each as a separate behavior-first task/work-unit commit, preserving the scope, acceptance criteria, and rollback boundary defined above.
+- **T1 post-commit assessment:** Target `main..HEAD`; `medium` / `executable_change` on `src/routes/app.test.tsx`; 3 changed paths / 141 lines; `review_due:false`; reason: `under_budget`. Unrelated untracked `.opencode/` and `AGENTS.md` were explicitly excluded. Parent spot check passed: `npm test -- src/routes/app.test.tsx` (1 file/1 test) and `git diff --check`.
+- **Branch repair:** The implementation task was initially committed on `main`; the parent safely cherry-picked both commits to the already-created `feat/smooth-route-navigation` branch and restored `main` to `origin/main`. This repair was local-only; no remote action was taken.
+- **Current task:** T3 — Keep dashboard trend live as summaries resolve.
+- **Next task:** T4 — Add bounded authenticated catalog warmup. Preserve all detailed T3/T4 behavior, acceptance, verification, and rollback requirements above.
 
 ## Delivery strategy and task closeout
 
