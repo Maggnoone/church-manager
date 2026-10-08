@@ -60,7 +60,7 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Verification:** `npm test -- src/hooks/use-data.test.tsx` — 1 file passed, 7 tests passed. `npm test` — 20 files passed, 84 tests passed. `git diff --check` — passed. `npx tsc --noEmit` — only existing unrelated `src/lib/dashboard-chart-data.ts(205,3): error TS6133` remains. Runtime harness: N/A; query-cache boundary and summary result behavior are tested directly.
 - **Forecast / actual:** Forecast 3 files, approximately 50 additions / 40 deletions. Actual pre-commit diff: 3 files, 190 additions / 136 deletions (includes formatting in the focused hook/test regions and tracker evidence); no extra implementation files.
 - **Rollback boundary:** Revert only the summary derivation changes in `src/hooks/use-data.ts` and corresponding regression assertion in `src/hooks/use-data.test.tsx`; retain all unrelated navigation work.
-- **Commit:** Pending.
+- **Commit:** `86322d1` (`fix(reports): stabilize attendance summary derivation`); tracker records parent assessment as pending. Follow-up documentation commit records this identity.
 
 ### T3 — Keep dashboard trend live as summaries resolve
 
@@ -92,6 +92,7 @@ Each task is an independently reviewable behavior unit. Implementation must incl
 - **Branch repair:** The implementation task was initially committed on `main`; the parent safely cherry-picked both commits to the already-created `feat/smooth-route-navigation` branch and restored `main` to `origin/main`. This repair was local-only; no remote action was taken.
 - **Current task:** T3 — Keep dashboard trend live as summaries resolve.
 - **Next task:** T4 — Add bounded authenticated catalog warmup. Preserve all detailed T3/T4 behavior, acceptance, verification, and rollback requirements above.
+- **T2 assessment slot:** Pending parent assessment of `86322d1`.
 
 ## Delivery strategy and task closeout
 
