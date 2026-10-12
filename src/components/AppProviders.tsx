@@ -1,7 +1,10 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { charlasListQueryOptions, gruposSimpleQueryOptions } from "@/hooks/use-data";
+import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -35,11 +38,27 @@ function AuthGate({ children }: { children: ReactNode }) {
   return children;
 }
 
+function AuthenticatedCatalogWarmup() {
+  const { user, loading, rolesReady } = useAuth();
+  const client = useQueryClient();
+
+  useEffect(() => {
+    if (!user || loading || !rolesReady) return;
+    void Promise.all([
+      client.prefetchQuery(charlasListQueryOptions()),
+      client.prefetchQuery(gruposSimpleQueryOptions()),
+    ]);
+  }, [client, loading, rolesReady, user?.id]);
+
+  return null;
+}
+
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <AuthenticatedCatalogWarmup />
           <AuthGate>
             <TooltipProvider>
               {children}

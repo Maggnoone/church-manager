@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { logSafeError } from "@/lib/safe-error";
 
@@ -17,6 +18,7 @@ interface AuthContextValue {
   session: Session | null;
   user: User | null;
   roles: AppRole[];
+  rolesReady: boolean;
   loading: boolean;
   isAdmin: boolean;
   isTesorero: boolean;
@@ -32,9 +34,11 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<AppRole[]>([]);
+  const [rolesReady, setRolesReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const mountedRef = useRef(false);
   const sessionVersionRef = useRef(0);
@@ -47,6 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       expectedSessionVersion?: number,
       isActive: () => boolean = () => mountedRef.current,
     ) => {
+      if (isActive() && mountedRef.current && activeUserIdRef.current === userId) {
+        setRolesReady(false);
+      }
       try {
         const { data, error } = await supabase
           .from("user_roles")
@@ -63,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               sessionVersionRef.current === expectedSessionVersion)
           ) {
             setRoles([]);
+            setRolesReady(false);
           }
           return;
         }
@@ -75,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             sessionVersionRef.current === expectedSessionVersion)
         ) {
           setRoles((data ?? []).map((r) => r.role as AppRole));
+          setRolesReady(true);
         }
       } catch (error) {
         logSafeError("[Auth] Failed to load user roles", error);
@@ -86,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             sessionVersionRef.current === expectedSessionVersion)
         ) {
           setRoles([]);
+          setRolesReady(false);
         }
       }
     },
@@ -110,11 +120,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const nextUserId = nextSession?.user.id ?? null;
       const previousUserId = activeUserIdRef.current;
       activeUserIdRef.current = nextUserId;
+      if (previousUserId !== nextUserId) {
+        queryClient.clear();
+        setRolesReady(false);
+      }
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
 
       if (!nextSession?.user || previousUserId !== nextUserId) {
         setRoles([]);
+        setRolesReady(false);
       }
 
       return {
@@ -195,10 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const currentUserId = activeUserIdRef.current;
           const currentSessionVersion = sessionVersionRef.current;
 
-          if (
-            currentUserId &&
-            roleLoadAttemptedVersionRef.current < currentSessionVersion
-          ) {
+          if (currentUserId && roleLoadAttemptedVersionRef.current < currentSessionVersion) {
             scheduleRoleLoad(currentUserId, currentSessionVersion);
           }
 
@@ -232,14 +244,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logSafeError("[Auth] Failed to unsubscribe from auth changes", error);
       }
     };
-  }, [loadRoles]);
+  }, [loadRoles, queryClient]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   const refreshRoles = useCallback(async () => {
-    if (activeUserIdRef.current) await loadRoles(activeUserIdRef.current);
+    if (activeUserIdRef.current) {
+      setRolesReady(false);
+      await loadRoles(activeUserIdRef.current);
+    }
   }, [loadRoles]);
 
   const isAdmin = roles.includes("admin");
@@ -253,6 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         user,
         roles,
+        rolesReady,
         loading,
         isAdmin,
         isTesorero,

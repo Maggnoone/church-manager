@@ -234,8 +234,12 @@ export function useCharlas(options?: { enabled?: boolean }) {
 }
 
 export function useCharlasList() {
-  return useQuery<Pick<Charla, "id" | "titulo" | "fecha" | "tipo">[]>({
-    queryKey: ["charlas-list"],
+  return useQuery(charlasListQueryOptions());
+}
+
+export function charlasListQueryOptions() {
+  return {
+    queryKey: ["charlas-list"] as const,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("charlas")
@@ -244,7 +248,7 @@ export function useCharlasList() {
       if (error) throw error;
       return (data ?? []) as Pick<Charla, "id" | "titulo" | "fecha" | "tipo">[];
     },
-  });
+  };
 }
 
 export function useCharlasCalendario() {
@@ -275,14 +279,18 @@ export function useGrupos() {
 }
 
 export function useGruposSimple() {
-  return useQuery<Pick<Grupo, "id" | "nombre">[]>({
-    queryKey: ["grupos-simple"],
+  return useQuery(gruposSimpleQueryOptions());
+}
+
+export function gruposSimpleQueryOptions() {
+  return {
+    queryKey: ["grupos-simple"] as const,
     queryFn: async () => {
       const { data, error } = await supabase.from("grupos").select("id, nombre").order("nombre");
       if (error) throw error;
       return (data ?? []) as Pick<Grupo, "id" | "nombre">[];
     },
-  });
+  };
 }
 
 /* ── Asistencia ── */

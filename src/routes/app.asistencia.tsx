@@ -137,6 +137,10 @@ function AsistenciaPage() {
       if (data.column.index === 2 && text === "Presente") {
         data.cell.styles.fontStyle = "bold";
       }
+    }, {
+      brandedAttendance: {
+        summary: `${filteredConfirmandos.length} confirmandos · ${presentes} presentes · ${filteredConfirmandos.length - presentes} ausentes`,
+      },
     });
     toast.success("PDF exportado correctamente");
   };

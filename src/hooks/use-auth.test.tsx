@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import type { ReactNode } from "react";
@@ -17,9 +17,11 @@ vi.mock("@/integrations/supabase/client", () => ({
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      then: vi.fn().mockImplementation((cb: (v: unknown) => unknown) =>
-        Promise.resolve(cb({ data: [{ role: "admin" }], error: null })),
-      ),
+      then: vi
+        .fn()
+        .mockImplementation((cb: (v: unknown) => unknown) =>
+          Promise.resolve(cb({ data: [{ role: "admin" }], error: null })),
+        ),
     }),
   },
 }));
@@ -41,7 +43,10 @@ describe("useAuth", () => {
 
   it("should start in loading state with no user", async () => {
     const { supabase } = await import("@/integrations/supabase/client");
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: null }, error: null });
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: null },
+      error: null,
+    });
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -50,19 +55,30 @@ describe("useAuth", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.user).toBeNull();
+    expect(result.current.rolesReady).toBe(false);
   });
 
   it("should set user and roles when session exists", async () => {
     const { supabase } = await import("@/integrations/supabase/client");
     const mockSession = {
-      user: { id: "user-1", email: "test@test.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() },
+      user: {
+        id: "user-1",
+        email: "test@test.com",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+      },
       access_token: "token",
       refresh_token: "refresh",
       expires_in: 3600,
       expires_at: Date.now() + 3600,
       token_type: "bearer" as const,
     };
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: mockSession }, error: null });
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: mockSession },
+      error: null,
+    });
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -70,6 +86,57 @@ describe("useAuth", () => {
     expect(result.current.user).toEqual(mockSession.user);
     expect(result.current.roles).toEqual(["admin"]);
     expect(result.current.isAdmin).toBe(true);
+    expect(result.current.rolesReady).toBe(true);
+  });
+
+  it("keeps roles not ready when the role query fails", async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: { user: { id: "user-1" } } as never },
+      error: null,
+    });
+    vi.mocked(supabase.from).mockReturnValueOnce({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockResolvedValue({ data: null, error: new Error("role failure") }),
+    } as never);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.rolesReady).toBe(false);
+    consoleError.mockRestore();
+  });
+
+  it("clears cached account data synchronously on logout and account changes", async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    let authCallback!: (_event: string, session: unknown) => void;
+    vi.mocked(supabase.auth.onAuthStateChange).mockImplementationOnce((callback) => {
+      authCallback = callback as typeof authCallback;
+      return { data: { subscription: { unsubscribe: vi.fn() } } } as never;
+    });
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: null },
+      error: null,
+    });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>{children}</AuthProvider>
+      </QueryClientProvider>
+    );
+    const { unmount } = renderHook(() => useAuth(), { wrapper });
+    queryClient.setQueryData(["account-data"], "signed-in-user");
+    act(() => authCallback("SIGNED_IN", { user: { id: "user-1" } }));
+    expect(queryClient.getQueryData(["account-data"])).toBeUndefined();
+    queryClient.setQueryData(["account-data"], "signed-in-user");
+    act(() => authCallback("SIGNED_OUT", null));
+    expect(queryClient.getQueryData(["account-data"])).toBeUndefined();
+
+    queryClient.setQueryData(["account-data"], "user-one");
+    act(() => authCallback("SIGNED_IN", { user: { id: "user-2" } }));
+    expect(queryClient.getQueryData(["account-data"])).toBeUndefined();
+    unmount();
   });
 
   it("should finish loading when session restoration fails", async () => {
@@ -130,14 +197,24 @@ describe("useAuth", () => {
   it("should sign out and clear state", async () => {
     const { supabase } = await import("@/integrations/supabase/client");
     const mockSession = {
-      user: { id: "user-1", email: "test@test.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() },
+      user: {
+        id: "user-1",
+        email: "test@test.com",
+        app_metadata: {},
+        user_metadata: {},
+        aud: "authenticated",
+        created_at: new Date().toISOString(),
+      },
       access_token: "token",
       refresh_token: "refresh",
       expires_in: 3600,
       expires_at: Date.now() + 3600,
       token_type: "bearer" as const,
     };
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({ data: { session: mockSession }, error: null });
+    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
+      data: { session: mockSession },
+      error: null,
+    });
 
     const { result } = renderHook(() => useAuth(), { wrapper });
     await waitFor(() => expect(result.current.loading).toBe(false));

@@ -97,6 +97,12 @@ export function ConfirmandoAttendanceDetail({
       rows,
       filename,
       subtitle,
+      undefined,
+      {
+        brandedAttendance: {
+          summary: `${total} charlas · ${presentes} presentes · ${ausentes} ausentes · ${pct}% de asistencia`,
+        },
+      },
     );
   };
 

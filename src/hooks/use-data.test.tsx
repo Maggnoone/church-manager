@@ -6,6 +6,10 @@ import {
   useAsistenciaHistorial,
   useAsistenciaPorConfirmando,
   useAsistenciaResumen,
+  charlasListQueryOptions,
+  gruposSimpleQueryOptions,
+  useCharlasList,
+  useGruposSimple,
 } from "@/hooks/use-data";
 import type { ReactNode } from "react";
 
@@ -93,6 +97,34 @@ describe("useConfirmandos", () => {
     const { result } = renderHook(() => useConfirmandos({ enabled: false }), { wrapper });
     expect(result.current.isPending).toBe(true);
     expect(result.current.fetchStatus).toBe("idle");
+  });
+});
+
+describe("bounded catalog query options", () => {
+  it("shares the prefetched catalog entries with consuming hooks", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: 30_000 } },
+    });
+    await Promise.all([
+      queryClient.prefetchQuery(charlasListQueryOptions()),
+      queryClient.prefetchQuery(gruposSimpleQueryOptions()),
+    ]);
+    const options = { wrapper: createWrapper(queryClient) };
+    const { result: charlas } = renderHook(() => useCharlasList(), options);
+    const { result: grupos } = renderHook(() => useGruposSimple(), options);
+
+    expect(charlas.current.data).toEqual(mockResponses.charlas);
+    expect(grupos.current.data).toEqual([{ id: "1", full_name: "Juan Pérez" }]);
+    const { supabase } = await import("@/integrations/supabase/client");
+    const tables = vi.mocked(supabase.from).mock.calls.map(([table]) => table);
+    expect(tables.filter((table) => table === "charlas")).toHaveLength(1);
+    expect(tables.filter((table) => table === "grupos")).toHaveLength(1);
+    expect(queryClient.getQueryData(charlasListQueryOptions().queryKey)).toEqual(
+      mockResponses.charlas,
+    );
+    expect(queryClient.getQueryData(gruposSimpleQueryOptions().queryKey)).toEqual([
+      { id: "1", full_name: "Juan Pérez" },
+    ]);
   });
 });
 

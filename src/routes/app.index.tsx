@@ -26,7 +26,6 @@ import {
   buildAttendanceTrendFromResumen,
   buildConfirmandoStatusCounts,
   buildPendingRequirements,
-  type AttendanceTrendPoint,
   type ChartCategory,
 } from "@/lib/dashboard-chart-data";
 import logoESP from "@/assets/logoESP.png";
@@ -47,7 +46,6 @@ interface DashboardStats {
   pendiente: number;
   pendingRequirements: ChartCategory[];
   confirmandoStatuses: ChartCategory[];
-  attendanceTrend: AttendanceTrendPoint[];
 }
 
 interface KpiCard {
@@ -140,7 +138,6 @@ function Dashboard() {
         pendiente: Math.max(costoTotal - cobradoReal, 0),
         pendingRequirements: buildPendingRequirements(dataConf),
         confirmandoStatuses: buildConfirmandoStatusCounts(dataConf),
-        attendanceTrend: buildAttendanceTrendFromResumen(resumen),
       };
     },
   });
@@ -200,6 +197,7 @@ function Dashboard() {
         ]
       : []),
   ];
+  const attendanceTrend = buildAttendanceTrendFromResumen(resumen);
 
   const renderKpiCard = (card: KpiCard) => (
     <StatCard
@@ -256,8 +254,8 @@ function Dashboard() {
       <div className="grid min-w-0 gap-4 lg:grid-cols-3">
         <ConfirmandoStatusChart data={stats?.confirmandoStatuses ?? []} isLoading={isLoading} />
         <AttendanceTrendChart
-          data={stats?.attendanceTrend ?? []}
-          isLoading={isLoading || loadingResumen}
+          data={attendanceTrend}
+          isLoading={loadingResumen}
           className="lg:col-span-2"
         />
       </div>

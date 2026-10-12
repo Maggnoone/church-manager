@@ -5,7 +5,9 @@ import { Route } from "@/routes/app";
 
 const state = vi.hoisted(() => ({ page: "Dashboard", outletMounts: 0, outletUnmounts: 0 }));
 vi.mock("@/hooks/use-auth", () => ({ useAuth: () => ({ user: { id: "user-1" } }) }));
-vi.mock("@/components/ui/sidebar", () => ({ SidebarProvider: ({ children }: { children: ReactNode }) => <>{children}</> }));
+vi.mock("@/components/ui/sidebar", () => ({
+  SidebarProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
+}));
 vi.mock("@/components/AppSidebar", () => ({ AppSidebar: () => null }));
 vi.mock("@/components/app-topbar", () => ({ AppTopbar: () => null }));
 vi.mock("@/components/command-palette", () => ({ CommandPalette: () => null }));
@@ -14,7 +16,9 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   function Outlet() {
     useEffect(() => {
       state.outletMounts += 1;
-      return () => { state.outletUnmounts += 1; };
+      return () => {
+        state.outletUnmounts += 1;
+      };
     }, []);
     return <div>{state.page}</div>;
   }

@@ -31,29 +31,80 @@ export function exportToPDF(
   subtitle?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   didParseCell?: (data: any) => void,
+  presentation?: { brandedAttendance?: { summary?: string } },
 ) {
   const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.setTextColor(40, 80, 50);
-  doc.text(title, 14, 18);
+  const branded = presentation?.brandedAttendance;
+  const teal: [number, number, number] = [13, 148, 136];
+  if (branded) {
+    doc.setFillColor(...teal);
+    doc.rect(0, 0, 210, 4, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(15, 118, 110);
+    doc.text("ESPERANZA DE SAN PABLO", 14, 13);
+    doc.setFont("helvetica", "normal");
+  }
+  doc.setFontSize(branded ? 18 : 16);
+  doc.setTextColor(
+    ...(branded
+      ? ([12, 26, 23] as [number, number, number])
+      : ([40, 80, 50] as [number, number, number])),
+  );
+  doc.text(title, 14, branded ? 22 : 18);
   if (subtitle) {
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(subtitle, 14, 25);
+    doc.setTextColor(
+      ...(branded
+        ? ([92, 117, 112] as [number, number, number])
+        : ([100, 100, 100] as [number, number, number])),
+    );
+    doc.text(subtitle, 14, branded ? 29 : 25);
   }
   doc.setFontSize(8);
   doc.setTextColor(120);
-  doc.text(`Generado: ${new Date().toLocaleString("es-AR")}`, 14, subtitle ? 31 : 25);
+  doc.text(
+    `Generado: ${new Date().toLocaleString("es-AR")}`,
+    14,
+    branded ? 35 : subtitle ? 31 : 25,
+  );
+
+  if (branded?.summary) {
+    doc.setFillColor(211, 244, 236);
+    doc.roundedRect(14, 40, 182, 13, 2, 2, "F");
+    doc.setFontSize(9);
+    doc.setTextColor(15, 118, 110);
+    doc.text(branded.summary, 19, 48);
+  }
 
   autoTable(doc, {
     head: [columns],
     body: rows,
-    startY: subtitle ? 36 : 30,
-    styles: { fontSize: 9, cellPadding: 2 },
-    headStyles: { fillColor: [82, 130, 95], textColor: 255 },
-    alternateRowStyles: { fillColor: [248, 245, 235] },
+    startY: branded ? (branded.summary ? 59 : 41) : subtitle ? 36 : 30,
+    styles: {
+      fontSize: 9,
+      cellPadding: 2,
+      textColor: branded ? [12, 26, 23] : 20,
+      lineColor: branded ? [226, 236, 233] : 200,
+    },
+    headStyles: { fillColor: branded ? teal : [82, 130, 95], textColor: 255, fontStyle: "bold" },
+    alternateRowStyles: { fillColor: branded ? [251, 253, 252] : [248, 245, 235] },
+    margin: branded ? { top: 18, bottom: 18, left: 14, right: 14 } : undefined,
     didParseCell,
   });
+
+  if (branded) {
+    const pageCount = doc.getNumberOfPages();
+    for (let page = 1; page <= pageCount; page += 1) {
+      doc.setPage(page);
+      doc.setDrawColor(226, 236, 233);
+      doc.line(14, 282, 196, 282);
+      doc.setFontSize(8);
+      doc.setTextColor(92, 117, 112);
+      doc.text("Esperanza de San Pablo · Una Confirmación de Fe", 14, 288);
+      doc.text(`Página ${page} de ${pageCount}`, 196, 288, { align: "right" });
+    }
+  }
 
   doc.save(`${filename}.pdf`);
 }
