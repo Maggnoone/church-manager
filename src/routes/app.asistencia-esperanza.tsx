@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { exportToCSV, exportToXLSX, exportToPDF } from "@/lib/export";
+import { buildEsperanzaAttendancePdfPresentation } from "@/lib/esperanza-attendance-pdf";
 import {
   ChevronLeft,
   ChevronRight,
@@ -169,28 +170,19 @@ function AsistenciaEsperanzaPage() {
     }
     const columns = ["Nombre", "Teléfono", "Estado"];
     const rows = exportRows.map((r) => [r.Nombre, r.Teléfono, r.Estado]);
-    const formattedDate = selectedDate.toLocaleDateString("es-AR", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    const presentation = buildEsperanzaAttendancePdfPresentation({
+      selectedDate,
+      present: presentes,
+      total: miembros.length,
     });
-    const subtitle = `Fecha: ${formattedDate} | ${presentes}/${miembros.length} presentes`;
     exportToPDF(
       "Asistencia Esperanza",
       columns,
       rows,
       `asistencia-esperanza-${selectedKey}`,
-      subtitle,
-      (data) => {
-        const text = data.cell.text.join(" ");
-        if (data.column.index === 2 && text === "Ausente") {
-          data.cell.styles.textColor = [220, 38, 38];
-          data.cell.styles.fontStyle = "bold";
-        }
-        if (data.column.index === 2 && text === "Presente") {
-          data.cell.styles.fontStyle = "bold";
-        }
-      },
+      presentation.subtitle,
+      presentation.didParseCell,
+      presentation.options,
     );
   };
 
