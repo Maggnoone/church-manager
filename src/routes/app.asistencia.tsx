@@ -8,7 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { formatDateTime, exportToCSV, exportToXLSX, exportToPDF } from "@/lib/export";
+import {
+  attendanceStatusCellStyle,
+  formatDateTime,
+  exportToCSV,
+  exportToXLSX,
+  exportToPDF,
+} from "@/lib/export";
 import { ClipboardCheck, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { useCharlasList, useConfirmandosActivos, useAsistencia, useGruposSimple } from "@/hooks/use-data";
 import { ListPagination, LIST_PAGE_SIZE } from "@/components/ListPagination";
@@ -127,21 +133,21 @@ function AsistenciaPage() {
     const filename = `asistencia-${charlaSeleccionada?.titulo || "charla"}-${new Date().toISOString().split("T")[0]}`;
     const columns = ["Confirmando", "Grupo", "Estado", "Fecha y hora de charla"];
     const rows = exportData.map((item) => [item["Confirmando"], item["Grupo"], item["Estado"], item["Fecha y hora de charla"]]);
-    const subtitle = `Charla: ${charlaSeleccionada?.titulo || "—"} | ${formatDateTime(charlaSeleccionada?.fecha)} | ${presentes}/${filteredConfirmandos.length} presentes`;
-    exportToPDF("Reporte de Asistencia", columns, rows, filename, subtitle, (data) => {
-      const text = data.cell.text.join(" ");
-      if (data.column.index === 2 && text === "Ausente") {
-        data.cell.styles.textColor = [220, 38, 38];
-        data.cell.styles.fontStyle = "bold";
-      }
-      if (data.column.index === 2 && text === "Presente") {
-        data.cell.styles.fontStyle = "bold";
-      }
-    }, {
-      brandedAttendance: {
-        summary: `${filteredConfirmandos.length} confirmandos · ${presentes} presentes · ${filteredConfirmandos.length - presentes} ausentes`,
+    const subtitle = `${formatDateTime(charlaSeleccionada?.fecha)} | ${presentes}/${filteredConfirmandos.length} presentes`;
+    exportToPDF(
+      "Reporte de Asistencia",
+      columns,
+      rows,
+      filename,
+      subtitle,
+      attendanceStatusCellStyle(2),
+      {
+        brandedAttendance: {
+          summary: `${filteredConfirmandos.length} confirmandos · ${presentes} presentes · ${filteredConfirmandos.length - presentes} ausentes`,
+          context: charlaSeleccionada?.titulo || "—",
+        },
       },
-    });
+    );
     toast.success("PDF exportado correctamente");
   };
 

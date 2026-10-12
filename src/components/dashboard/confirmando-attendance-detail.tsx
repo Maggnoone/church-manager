@@ -22,7 +22,7 @@ import { useAsistenciaHistorial } from "@/hooks/use-data";
 import { buildConfirmandoAttendanceTrend } from "@/lib/dashboard-chart-data";
 import { AttendanceTrendChart } from "./attendance-trend-chart";
 import { ListPagination } from "@/components/ListPagination";
-import { formatDateTime, exportToPDF } from "@/lib/export";
+import { attendanceStatusCellStyle, formatDateTime, exportToPDF } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Calendar, CheckCircle2, XCircle, BarChart3, FileDown } from "lucide-react";
 
@@ -97,7 +97,7 @@ export function ConfirmandoAttendanceDetail({
       rows,
       filename,
       subtitle,
-      undefined,
+      attendanceStatusCellStyle(3),
       {
         brandedAttendance: {
           summary: `${total} charlas · ${presentes} presentes · ${ausentes} ausentes · ${pct}% de asistencia`,

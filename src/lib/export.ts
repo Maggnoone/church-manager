@@ -4,6 +4,23 @@ import autoTable from "jspdf-autotable";
 
 export { formatCurrency, formatDate, formatDateTime } from "./format";
 
+type AttendanceCellData = {
+  column: { index: number };
+  cell: { text: string[]; styles: { fontStyle?: string; textColor?: [number, number, number] } };
+};
+
+export function attendanceStatusCellStyle(statusColumnIndex: number) {
+  return (data: AttendanceCellData) => {
+    if (data.column.index !== statusColumnIndex) return;
+    const text = data.cell.text.join(" ");
+    if (text === "Presente") data.cell.styles.fontStyle = "bold";
+    if (text === "Ausente") {
+      data.cell.styles.fontStyle = "bold";
+      data.cell.styles.textColor = [220, 38, 38];
+    }
+  };
+}
+
 export function exportToCSV<T extends Record<string, unknown>>(rows: T[], filename: string) {
   if (!rows.length) return;
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -31,7 +48,7 @@ export function exportToPDF(
   subtitle?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   didParseCell?: (data: any) => void,
-  presentation?: { brandedAttendance?: { summary?: string } },
+  presentation?: { brandedAttendance?: { summary?: string; context?: string } },
 ) {
   const doc = new jsPDF();
   const branded = presentation?.brandedAttendance;
@@ -52,6 +69,31 @@ export function exportToPDF(
       : ([40, 80, 50] as [number, number, number])),
   );
   doc.text(title, 14, branded ? 22 : 18);
+  if (branded?.context) {
+    const titleWidth = doc.getTextWidth(title);
+    const contextX = Math.min(196, 14 + titleWidth + 4);
+    const availableWidth = 196 - contextX;
+    const context = `— ${branded.context}`;
+    doc.setFont("helvetica", "normal");
+    let fittedContext = context;
+    if (doc.getTextWidth(fittedContext) > availableWidth) {
+      fittedContext = "";
+      while (
+        fittedContext.length < context.length &&
+        doc.getTextWidth(`${context.slice(0, fittedContext.length + 1)}…`) <= availableWidth
+      ) {
+        fittedContext = context.slice(0, fittedContext.length + 1);
+      }
+      if (doc.getTextWidth(`${fittedContext}…`) <= availableWidth) {
+        fittedContext = `${fittedContext}…`;
+      }
+    }
+    if (fittedContext) {
+      doc.setTextColor(15, 118, 110);
+      doc.text(fittedContext, contextX, 22);
+    }
+    doc.setFont("helvetica", "normal");
+  }
   if (subtitle) {
     doc.setFontSize(10);
     doc.setTextColor(
